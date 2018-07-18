@@ -6,3 +6,5 @@ Hardware Drivers
     peripheral/uart
     peripheral/spi
     peripheral/hwecc
+    peripheral/flash
+    peripheral/dmac
