@@ -5,7 +5,7 @@ PAD ring
 General description
 >>>>>>>>>>>>>>>>>>>
 
-BX2400 has 30 general GPIOs(P0 to P29), one IO for external reset and one IO for test mode. Each of the 30 GPIOS has multiple functions which are defined by the pin share logic. The IO pads for the general GPIOs are all bi-directional IO PADs and have many programmable features. The block diagram of the GPIOs is shown below:
+BX2400 has 27 general GPIOs(P0 to P13, P15 to P17, P20 to P29. **Please note that P14, P18 and P19 do not exist!**), one IO for external reset and one IO for test mode. Each of the 30 GPIOS has multiple functions which are defined by the pin share logic. The IO pads for the general GPIOs are all bi-directional IO PADs and have many programmable features. The block diagram of the GPIOs is shown below:
 
 .. image:: pad.png
 
@@ -182,27 +182,27 @@ Column idx indicates the predefined index for the function. There is a programma
 =================  ==============
 address            reg name
 0x20132030[31:28]  func_io07_sel
-0x20132030 [27:24] func_io06_sel
-0x20132030 [23:20] func_io05_sel
-0x20132030 [19:16] func_io04_sel
-0x20132030 [15:12] func_io03_sel
-0x20132030 [11:8]  func_io02_sel
-0x20132030 [7:4]   func_io01_sel
-0x20132030 [3:0]   func_io00_sel
+0x20132030[27:24]  func_io06_sel
+0x20132030[23:20]  func_io05_sel
+0x20132030[19:16]  func_io04_sel
+0x20132030[15:12]  func_io03_sel
+0x20132030[11:8]   func_io02_sel
+0x20132030[7:4]    func_io01_sel
+0x20132030[3:0]    func_io00_sel
 0x20132034[31:28]  func_io15_sel
-0x20132034 [27:24] func_io14_sel
-0x20132034 [23:20] func_io13_sel
-0x20132034 [19:16] func_io12_sel
-0x20132034 [15:12] func_io11_sel
-0x20132034 [11:8]  func_io10_sel
-0x20132034 [7:4]   func_io09_sel
-0x20132034 [3:0]   func_io08_sel
-0x20132038 [23:20] func_io21_sel
-0x20132038 [19:16] func_io20_sel
-0x20132038 [15:12] func_io19_sel
-0x20132038 [11:8]  func_io18_sel
-0x20132038 [7:4]   func_io17_sel
-0x20132038 [3:0]   func_io16_sel
+0x20132034[27:24]  func_io14_sel
+0x20132034[23:20]  func_io13_sel
+0x20132034[19:16]  func_io12_sel
+0x20132034[15:12]  func_io11_sel
+0x20132034[11:8]   func_io10_sel
+0x20132034[7:4]    func_io09_sel
+0x20132034[3:0]    func_io08_sel
+0x20132038[23:20]  func_io21_sel
+0x20132038[19:16]  func_io20_sel
+0x20132038[15:12]  func_io19_sel
+0x20132038[11:8]   func_io18_sel
+0x20132038[7:4]    func_io17_sel
+0x20132038[3:0]    func_io16_sel
 =================  ==============
 
 
