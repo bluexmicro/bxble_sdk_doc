@@ -8,3 +8,4 @@ Hardware Drivers
     peripheral/hwecc
     peripheral/flash
     peripheral/dmac
+    peripheral/adc
