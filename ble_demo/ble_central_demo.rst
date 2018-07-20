@@ -139,24 +139,24 @@ _`ble 协议栈和应用协议栈的信息交互`
 	static const osapp_msg_handler_table_t handler_table[]=
 	{
 		[0] =   {KE_MSG_DEFAULT_HANDLER,(osapp_msg_handler_t)osapp_default_msg_handler},
-		   ///connection indicate: receive connect request from master
-		   {GAPC_CONNECTION_REQ_IND,(osapp_msg_handler_t)osapp_gapc_conn_req_ind_handler},
-		   ///connection lost indicate handler
-		   {GAPC_DISCONNECT_IND,(osapp_msg_handler_t)osapp_gapc_disconnect_ind_handler},
-		   ///GAPM event complete
-		   {GAPM_CMP_EVT,(osapp_msg_handler_t)osapp_gapm_cmp_evt_handler},
-		   ///ble power on ready and should do a reset
-		   {GAPM_DEVICE_READY_IND,(osapp_msg_handler_t)osapp_device_ready_ind_handler},
-		   ///trigger when master need to read device information uuid 0x1800
-		   {GAPC_GET_DEV_INFO_REQ_IND,(osapp_msg_handler_t)osapp_gapc_get_dev_info_req_ind_handler},
-		   ///add service complete and store service handler
-		   {GATTM_ADD_SVC_RSP,(osapp_msg_handler_t)osapp_gattm_add_svc_rsp_handler},
-		   ///master write data to device
-		   {GATTC_WRITE_REQ_IND,(osapp_msg_handler_t)osapp_gattc_write_req_ind_handler},
-		   ///master read data from device
-		   {GATTC_READ_REQ_IND,(osapp_msg_handler_t)osapp_gattc_read_req_ind_handler},
-		   ///gattc event has completed
-		   {GATTC_CMP_EVT,(osapp_msg_handler_t)osapp_gattc_cmp_evt_handler},
+			///connection indicate: receive connect request from master
+			{GAPC_CONNECTION_REQ_IND,(osapp_msg_handler_t)osapp_gapc_conn_req_ind_handler},
+			///connection lost indicate handler
+			{GAPC_DISCONNECT_IND,(osapp_msg_handler_t)osapp_gapc_disconnect_ind_handler},
+			///GAPM event complete
+			{GAPM_CMP_EVT,(osapp_msg_handler_t)osapp_gapm_cmp_evt_handler},
+			///ble power on ready and should do a reset
+			{GAPM_DEVICE_READY_IND,(osapp_msg_handler_t)osapp_device_ready_ind_handler},
+			///trigger when master need to read device information uuid 0x1800
+			{GAPC_GET_DEV_INFO_REQ_IND,(osapp_msg_handler_t)osapp_gapc_get_dev_info_req_ind_handler},
+			///GAPC event complete
+			{GAPC_CMP_EVT,(osapp_msg_handler_t)osapp_gapc_cmp_evt_handler},
+			///This command is used to allocate a task for specific profile (service or client).
+			{GAPM_PROFILE_ADDED_IND,osapp_gapm_profile_added_ind_handler},
+			///triggered when scanning operation of selective connection establishment procedure receive advertising report information.
+			{GAPM_ADV_REPORT_IND,osapp_gapm_adv_report_ind_handler},
+			///gattc event has completed
+			{GATTC_CMP_EVT,(osapp_msg_handler_t)osapp_gattc_cmp_evt_handler},
 	};
 
 	const osapp_msg_handler_info_t handler_info = ARRAY_INFO(handler_table);
