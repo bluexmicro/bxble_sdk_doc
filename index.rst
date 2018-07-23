@@ -9,6 +9,7 @@ Welcome to bx2400_sdk's documentation!
 .. toctree::
    :maxdepth: 2
    
+    
    getting_started
    hardware_drivers 
    hardware/pinshare
