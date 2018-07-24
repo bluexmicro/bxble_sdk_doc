@@ -51,6 +51,8 @@ src_tr_width决定了length的单位，若src_tr_width == Transfer_Width_8_bits�
 
 src的地址的对齐要求由src_tr_width决定，即src_tr_width == Transfer_Width_16_bits； src应两字节对齐，src_tr_width == Transfer_Width_32_bits，src应四字节对齐。   
     
+对于内存-内存的DMA传输，tt_fc应固定设置为Memory_to_Memory_DMAC_Flow_Controller，src_msize,dst_msize可以设置为任意合法的Burst_Transaction_Length_*枚举类型。
+
 若中断使能，则回调函数在传输完成后中断处理上下文中被调用；若中断禁用，则不会调用回调函数。
     
 外设-内存之间的DMA传输已集成在相应外设驱动中，无需用户额外配置DMA。
