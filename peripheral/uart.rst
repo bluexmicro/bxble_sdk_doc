@@ -49,6 +49,8 @@ UART
 
 收发完成时，callback在中断处理上下文中被调用。
 
+对于同一个UART实例，必须在一次传输完成后，才可以发起下一次传输，即第一次发起app_uart_read后，必须在收发完成，callback被调用的时刻之后，才可以第二次发起app_uart_read。app_uart_write同理。
+
 bufptr不能指向栈上的数据区，且必须在收发完成之后，即callback被调用的时刻之后，才能释放。
         
 4. 流控
