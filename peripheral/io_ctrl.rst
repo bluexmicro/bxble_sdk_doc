@@ -86,6 +86,9 @@ IO_CTRL
         void io_ext_int_cfg(uint8_t pin_num,ext_int_mode_t mode,void (*callback)());
         void io_ext_int_en(uint8_t pin_num,bool enable);
     
+    .. note::
+    
+        只有GPIO15、GPIO16、GPIO17、GPIO22、GPIO23支持外部中断，即pin_num只可以是15、16、17、22、23。
         
     
 详细API介绍参见SDK目录plf/bx2400/src/sys_integration/sysctrl/io_ctrl.h
