@@ -113,7 +113,7 @@ BX2400使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出
 
       LOG_INIT();
 
-      LOG(LOG_LVL_INFO,"main\n");
+      LOG(LOG_LVL_INFO,"main\\n");
 
       LOG_INIT()需要在软件运行起来时调用一次，作为RTT的初始化，之后则不再需要调用。之后打印输出，只需要调用LOG即可，如上所示，可以打印出一个简单的字符串。而如果要打印复杂信息，如下所示：
 
