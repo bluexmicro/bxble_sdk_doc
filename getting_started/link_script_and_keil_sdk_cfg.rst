@@ -13,21 +13,24 @@ Link Script & Keil SDK Configuration
 
     .. image:: link_script_and_keil_sdk_cfg_img2.png
 
-    ARM的链接脚本的主要构成是Load Section和Exec Section。考虑一个典型的Flash上运行软件的例子：IC从Flash启动，之后需要要把所有的数据和一部分代码搬移到RAM中（例如Flash驱动，中断向量表，任务调度函数等，没办法放在Flash中），此时IC启动后ARM默认的__main()需要知道代码搬移的起始地址和目的地址，这就是通过链接脚本指定的。起始地址就是Load Section，而目标地址就是Exec Section。 BX2400的链接脚本主要内容如下:
+    ARM的链接脚本的主要构成是Load Section和Exec Section。考虑一个典型的Flash上运行软件的例子：IC从Flash启动，之后需要要把所有的数据和一部分代码搬移到RAM中（例如Flash驱动，中断向量表，任务调度函数等，没办法放在Flash中），此时IC启动后ARM默认的__main()需要知道代码搬移的起始地址和目的地址，这就是通过链接脚本指定的。起始地址就是Load Section，而目标地址就是Exec Section。 BX2400的链接脚本范例如下:
 
     ..  code:: c
 
         LR_RAM1 RAM_BASE ALIGN 0x80{
-                   ISR_VECTOR +0 {
+            ISR_VECTOR +0 
+            {
                 *(RESET, +First)
                 *(jump_table_area)
             }
-                   CODE_DATA_BSS +0{
+            CODE_DATA_BSS +0
+            {
                 *(+RO)
                 *(+RW)
-                            *(+ZI)
-        }
-            HEAP_STACK +0 UNINIT{
+                *(+ZI)
+            }
+            HEAP_STACK +0 UNINIT
+            {
                 *(HEAP)
                 *(STACK)
             } 
@@ -36,20 +39,24 @@ Link Script & Keil SDK Configuration
         
         LR_RAM3 AlignExpr(EM_END,0x4) ALIGN 0x4
         {
-            RWIP_ENV +0{
+            RWIP_ENV +0
+            {
                 rwip.o(+ZI)
             }
-            BOOT_PARAMS +0 UNINIT{
+            BOOT_PARAMS +0 UNINIT
+            {
                 *(boot_tunnel)
             }
-            RAM_UNLOADED +0 EMPTY 12{
-                   }
+            RAM_UNLOADED +0 EMPTY 12
+            {
+            }
             ScatterAssert(ImageLimit(RAM_UNLOADED)<=ROM_CODE_ZI_BASE)
         }
         
         LR_RAM2 CACHE_BASE
         {
-            NVDS_AREA +0 PADVALUE 0xffffffff{
+            NVDS_AREA +0 PADVALUE 0xffffffff
+            {
                 *(nvds_area)
             }
         }
