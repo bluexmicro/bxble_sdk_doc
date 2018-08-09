@@ -161,21 +161,29 @@ Link Script & Keil SDK Configuration
 
             .. image:: link_script_and_keil_sdk_cfg_img14.png
 
-            Flash擦写选项在Tools菜单下：
-
-            .. image:: link_script_and_keil_sdk_cfg_img15.png
-
-            根据用户选择的Flash种类，这里选择不同的擦写选项。点击相应菜单选项后，会弹出JFlash擦写工具：
-
-            .. image:: link_script_and_keil_sdk_cfg_img16.png
-
-            关于JFlash擦写工具，可以参考文档JFlash Tools
+            Flash擦写选项主要在Utilities下配置。
 
         -   Utilities选项
 
-            Utilities里不需要特别的配置，用户不需要关心。唯一需要注意的就是选择外部工具烧写Flash，且将Command和Arguments都清空。
+            Utilities里默认配置外部工具擦写Flash。
 
+            .. image:: link_script_and_keil_sdk_cfg_img15.png
+            
+            这里的prog.bat定位于\tools\prog_tool文件夹，但由于不同的Flash电压对应不同的配置文件，因此需要用户根据使用的Flash电压，手动修改具体的bat文件为prog_1v8.bat/prog_3v3.bat.
+            
+            .. image:: link_script_and_keil_sdk_cfg_img16.png
+            
+            之后在Keil主界面运行Flash Download，可以弹出JFlash界面。
+            
             .. image:: link_script_and_keil_sdk_cfg_img17.png
+            
+            关于JFlash擦写工具，可以参考文档JFlash Tools.
+            
+            ``!!! 注意：``
+            
+            -    JLink安装软件版本需要是V6以上；
+            
+            -    JLink需要安装在系统盘的Program Files (x86)文件夹下，否则bat文件无法定位到JFlash可执行文件的具体位置。
 
     #.  编译链接
 
