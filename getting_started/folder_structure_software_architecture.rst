@@ -45,7 +45,7 @@
 				 
 			.. image:: folder_structure_software_architecture_img5.png				 
 
-      plf/debug文件夹下需要用户了解的是log文件夹，其中包含了Segger RTT的源码，已经BX2400对用户封装的打印信息接口。关于RTT的具体内容，参加文档 |Debug Environment & Tools|.
+      plf/debug文件夹下需要用户了解的是log文件夹，其中包含了Segger RTT的源码，已经BX2400对用户封装的打印信息接口。关于RTT的具体内容，参见文档 |Debug Environment & Tools|.
 			
    #. plf/bx2400
 	 
