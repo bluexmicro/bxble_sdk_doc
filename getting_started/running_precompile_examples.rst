@@ -7,7 +7,7 @@ Running precompiled examples
 
 下载前的准备工作：
 
-1. 从Segger官网（https://www.segger.com/downloads/jlink/）下载最新的JLink安装文件
+1. 从Segger官网（https://www.segger.com/downloads/jlink/）下载最新的JLink安装文件 **(!!!必须V6以上版本)** 
 
 #. PC端插入JLink，可以在设备管理器中找到J-Link Driver，表示JLink已经安装成功。如下图所示：
 
