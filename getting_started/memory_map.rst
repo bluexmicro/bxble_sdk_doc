@@ -2,13 +2,17 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 BX2400的存储区域地址映射，需要从三个角度进行说明：Flash可执行文件的结构，Image结构和运行时地址映射。三者关系如下：
 
-.. image:: memory_map_img0.png
+    .. image:: memory_map_img0.png
+
+    - A:表示运行时，从Flash Image中复制到RAM中的代码段和数据段
+    
+    - B:表示运行时，留在Flash中，在运行时会被访问的代码和NVDS数据
 
 1. 存储空间介绍
 
     1. Flash可执行文件
         
-        Flash可执行文件指的是在在BX2400 SDK里编译链接，最后通过bin_merge生成的flash.hex/flash.bin，也是最终烧写入Flash中的二进制文件。如上图所示，包括Boot_in_ram, image0/image1和NVDS区域。
+        Flash可执行文件指的是在在BX2400 SDK里编译链接，最后通过bin_merge生成的flash.hex，也是最终烧写入Flash中的二进制文件。如上图所示，包括Boot_in_ram, image0/image1和NVDS区域。
 
          - 2nd bootloader: 表示BX2400启动的第二段流程（第一段软件启动流程1st bootloader在ROM里）可执行代码
 
@@ -62,7 +66,7 @@ BX2400的存储区域地址映射，需要从三个角度进行说明：Flash可
         |       |                     +------------+---------------------------+
         |       |                     | 0x60-0x80  |reserved                   |
         +-------+---------------------+------------+---------------------------+
-        | 0x80  | image code and data | 0x80-0x8c  |ISR Vector Table           |
+        | 0x80  | image code and data | 0x0-0x8c   |ISR Vector Table           |
         |       |                     +------------+---------------------------+
         |       |                     | 0x8c-0x100 |ROM Code Jump Table        |
         |       |                     +------------+---------------------------+
@@ -85,7 +89,7 @@ BX2400的存储区域地址映射，需要从三个角度进行说明：Flash可
          
          - Flash
          
-         Flash主要存储flash.hex/flash.bin，当RAM可以容纳所有用户软件/数据时，Flash在实际运行时不会有访问。只有当用户的软件/数据量无法完全塞入RAM中的时候，链接脚本才会将多余的代码放到Flash中去，此时CPU会通过Cache对Flash进行读操作
+         Flash主要存储flash.hex，当RAM可以容纳所有用户软件/数据时，Flash在实际运行时不会有访问。只有当用户的软件/数据量无法完全塞入RAM中的时候，链接脚本才会将多余的代码放到Flash中去，此时CPU会通过Cache对Flash进行读操作
 
         +-------------+-------------------+-------------------------+
         | Memory type | Address           | Description             |
@@ -104,19 +108,23 @@ BX2400的存储区域地址映射，需要从三个角度进行说明：Flash可
         +-------------+-------------------+-------------------------+
         |             |                   |                         |
         +-------------+-------------------+-------------------------+
-        | Flash       | 0x800000-         | Code for XIP            |
+        | Flash       | 0x800000-0x8XXXXX | Useless in runtime      |
+        |             +-------------------+-------------------------+
+        |             | 0x8XXXXX-         | Code for XIP            |
         |             +-------------------+-------------------------+
         |             |                   | Other contents in Flash |
         +-------------+-------------------+-------------------------+
 
 #. BX2400启动流程
 
+    .. image:: memory_map_img1.png
+
     BX2400的启动是从ROM开始，分为1st bootloader和2nd bootloader两部分。BX2400的Boot分为Boot from Flash和Boot from Uart两种，分别对应正常用户启动模式和量产模式。由于二者工作机制类似，此处重点介绍前者。
     
-    - 当IC上电时，CPU会自动运行1s bootloader，也就是ROM中起始地址之后的那一部分可执行代码。这部分代码里，会去检测Boot模式，以及对应IO的启动电压。假设此处检测到需要Boot from Flash，且电压为1.8V，bootloader会将Flash对应的IO电压配置为1.8V，之后尝试去Flash中一个固定的位置去读取2nd bootloader。如果读取不成功，会反复尝试从Flash boot；读取成功则将2nd bootloader读取入RAM中
+    - 1st step: 当IC上电时，CPU会自动运行1s bootloader，也就是ROM中起始地址之后的那一部分可执行代码。这部分代码里，会去检测Boot模式，以及对应IO的启动电压。假设此处检测到需要Boot from Flash，且电压为1.8V，bootloader会将Flash对应的IO电压配置为1.8V，之后尝试去Flash中一个固定的位置去读取2nd bootloader
     
-    - 当2nd bootloader读取到RAM中后，CPU会自动跳转到2nd bootloader处执行。2nd bootloader本身是一个完整的可执行文件，开始执行后，会找到RAM中Image中对应的地址，去读取Image的header结构，从中挑选出最新版本的Image，并读入RAM中
+    - 2nd step: 第一步1st bootloader读取2nd bootloader，如果不成功，会反复尝试从Flash boot；读取成功则将2nd bootloader读取入RAM中。当2nd bootloader读取到RAM中后，CPU会自动跳转到2nd bootloader处执行
     
-    - 在2nd bootloader执行完成后，CPU会跳转到读入RAM的用户Image处并开始执行，此时整个Boot流程完成
+    - 3rd step: 2nd bootloader本身是一个完整的可执行文件，开始执行后，会找到RAM中Image中对应的地址，去读取Image的header结构，从中挑选出最新版本的Image，并读入RAM中。在2nd bootloader执行完成后，CPU会跳转到读入RAM的用户Image处并开始执行，之后ROM/RAM/Flash里应该参与运行的代码和数据(图中红色部分)有可能被访问。此时整个Boot流程完成
     
     Boot from Uart的流程与此十分类似，唯一的不同是2nd bootloader不是从Flash中读取的，而是从Uart处接收到的，其他流程没有区别。当用户最终产品从上电开始运行时，进入的模式通常是Boot from Flash，而在产线上把用户代码烧写到Flash中去时，通常是Boot from Uart
