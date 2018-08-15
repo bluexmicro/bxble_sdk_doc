@@ -12,7 +12,7 @@ Getting Started
    getting_started/top_layer_header_files_cfg
    getting_started/memory_map
    getting_started/folder_structure_software_architecture
-
+   getting_started/flash_programming_guide_using_jflash
 
 Necessary software tools
 
