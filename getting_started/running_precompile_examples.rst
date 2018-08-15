@@ -13,7 +13,7 @@ Running precompiled examples
 
 .. image:: running_precompiled_examples_img1.png
 
-之后通过JFlash下载bin文件到Flash：
+之后通过JFlash下载hex/bin文件到Flash：
 
 1. 下载相应的可执行文件到本地目录
 
@@ -21,5 +21,5 @@ Running precompiled examples
 
 #. 重新上电，从Flash中启动，运行可执行文件
         
-根据具体的bin文件内容不同，重新运行后的开发板会有不同的执行结果。外设相关的APP需要查看相关的外设输出，BLE相关的APP需要查看空中数据。
+根据具体的hex/bin文件内容不同，重新运行后的开发板会有不同的执行结果。外设相关的APP需要查看相关的外设输出，BLE相关的APP需要查看空中数据。
 
