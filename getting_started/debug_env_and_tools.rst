@@ -3,31 +3,21 @@ Debug Environment and Tools
 
 BX2400使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出错时通过HardFault中断进行错误定位。
 
-1. DEBUG环境/debug.ini
+1. DEBUG环境/debug_flash.ini
 
    用户的DEBUG环境为Keil MDK：
 
    .. image:: debug_env_and_tools_img1.png
 
-   在工程配置选项里，有个debug.ini需要注意：
+   在工程配置选项里，有个debug_flash.ini需要注意：
 
    .. image:: debug_env_and_tools_img2.png
 
-   debug.ini文件是在Keil在debug时的配置文件，Keil会根据debug.ini的内容决定如果下载可执行文件，以及后续的动作。debug.ini的内容是：
-
-      LOAD .\Objects\BX2400.axf
-
-      SP = _RDWORD(0x00100000);
-
-      PC = _RDWORD(0x00100004);
-
-   可以看到debug.ini会告诉Keil去下载BX2400.axf文件到开发板，完成后从地址0x100000里取值到SP中，再从0x100004中取值到PC中。所以可以看出，debug.ini模式下，Keil会下载可执行文件到开发板，并直接改变SP和PC的值，而忽略了从Flash中启动的流程。再看另一个debug_flash.ini文件：
-
+   debug_flash.ini文件是在Keil在debug时的配置文件，Keil会根据debug_flash.ini的内容决定如果下载可执行文件，以及后续的动作。debug_flash.ini的内容是：
+   
       LOAD .\Objects\BX2400.axf NOCODE
 
-   这里只有下载可执行文件的指令，且有NOCODE标志，表示只是将将调试信息装载进来，但并不下载任何实质性的数据/指令到开发板，这种调试模式对应Flash已经有了可执行应用程序的情况，用户程序会从Flash启动开始走完整的流程。
-
-   根据用户开发不同阶段的不同需求，可以选择不同的ini文件。关于RAM运行和Flash运行的区别，可以参考文档Link script/Keil SDK config. 
+   可以看到debug_flash.ini下载可执行文件的指令，且有NOCODE标志，表示只是将将调试信息装载进来，但并不下载任何实质性的数据/指令到开发板，这种调试模式运行的前提，是用户需要事先将生成的hex/bin文件烧写入Flash中，之后用户程序会从Flash启动开始走完整的流程。
 
 #. Keil调试环境
 
