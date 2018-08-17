@@ -1,7 +1,8 @@
 Compiling and running a first example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-在开发自己的应用程序之前，需要在PC上验证是否已经完整安装所需要的工具链。安装工具链所需要的软件和步骤，请参考文档BX2400开发环境及工具链搭建指南。
+在开发自己的应用程序之前，需要在PC上验证是否已经完整安装所需要的工具链。安装工具链所需要的软件和步骤，请参考文档 :doc:`tools_installation` 
+
 工具链安装完备之后，可以打开BX2400 SDK里的Keil工程文件。
 
 .. image:: compiling_and_running_the_first_example_img1.png
@@ -44,7 +45,7 @@ Compiling and running a first example
 
 #. 运行调试hex
 
-    在Keil目录下找到生成的hex文件，并下载该文件到Flash中，详细步骤可以参考文档 :doc:`flash_programming_guide_using_jflash`
+    在Keil目录下找到生成的hex文件，并下载该文件到Flash中，详细步骤可以参考文档 :doc:`flash_programming_guide_using_jflash` 
 
    #. hex运行起来后，可以通过手机或者抓包器看到空中广播包：
 
@@ -52,6 +53,6 @@ Compiling and running a first example
 
       **!!!注意：避免在同一环境中运行两个地址完全相同的蓝牙应用**
 
-   #. 可以在Keil环境里暂停/运行，设置断点，单步调试等。具体细节参见文档 :doc: `debug_env_and_tools`
+   #. 可以在Keil环境里暂停/运行，设置断点，单步调试等。具体细节参见文档 :doc:`debug_env_and_tools`
       
       **!!!注意：在BX2400里，某些特定状态下，Keil里无法执行上面的调试步骤，例如当IC在反复睡醒时，此时CPU处于关电状态，JLink无法连接到IC。用户可以使能bx_sys_config.h中的宏DEBUGGER_ATTACHED，在此条件下编译生成的hex会跳过深睡眠的处理，保证在调试时用户的目标板可以连接到JLink**     
