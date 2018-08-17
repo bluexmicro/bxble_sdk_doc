@@ -1,7 +1,9 @@
 Flash programming guide using JFlash
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-BX2400支持通过JFlash读写Flash。在操作之前，需要下载JLink(V6版本以上，https://www.segger.com/downloads/jlink/)并安装，之后按照如下步骤操作：
+BX2400支持通过JFlash读写Flash。在操作之前，需要下载JLink(V6版本以上，`JLink下载`_)并安装，之后按照如下步骤操作：
+    
+    .. _JLink下载: https://www.segger.com/downloads/jlink/
 
 1. 准备好DVK/EVK，通过SWD接口将JLink连接到板子上，JLink另一端插入PC，在PC上能正确识别JLink设备
 

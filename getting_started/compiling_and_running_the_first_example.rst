@@ -10,11 +10,11 @@ Compiling and running a first example
 
 .. image:: compiling_and_running_the_first_example_img2.png
 
-对于BX2400调试，可以有两种调试方式：在SRAM中调试和在Flash中调试。对于刚刚上手的用户来说，推荐第一种方式。而对于在SRAM中已经将功能调试的差不多的用户来说，可以考虑第二种更贴近实际应用的调试方法。
+对于BX2400调试，通常需要两个基本步骤：编译链接生成hex和运行调试hex
 
-1. SRAM调试
+1. 编译链接生成hex
 
-   在BX2400 SDK中，有若干APP Demo，初次上手的用户可以选择其中一个，编译链接并下载到开发板运行。
+   在BX2400 SDK中，有若干APP Demo，初次上手的用户可以选择其中一个，编译链接。步骤如下：
 
    a. 打开bx_sys_config.h，配置本地蓝牙地址
 
@@ -26,7 +26,7 @@ Compiling and running a first example
 
       .. image:: compiling_and_running_the_first_example_img3.png
 
-      注意：这里的宏必须打开一个，且只能打开一个
+      **!!!注意：这里的宏必须使能一个，且只能使能一个**
 
    #. 编译链接
 
@@ -40,29 +40,18 @@ Compiling and running a first example
 
       .. image:: compiling_and_running_the_first_example_img6.png
 
-      Debug选项中，需要修改初始化文件为debug.ini
+      Debug选项中，确保调试初始化文件为debug_flash.ini
 
-   #. 下载axf文件到开发板中，并运行
+#. 运行调试hex
 
-      .. image:: compiling_and_running_the_first_example_img7.png
+    在Keil目录下找到生成的hex文件，并下载该文件到Flash中，详细步骤可以参考文档 :doc:`flash_programming_guide_using_jflash`
 
-   #. 此时可以通过手机或者抓包器看到空中广播包：
+   #. hex运行起来后，可以通过手机或者抓包器看到空中广播包：
 
       .. image:: compiling_and_running_the_first_example_img8.png
 
-      注意：避免在同一环境中运行两个地址完全相同的蓝牙应用
+      **!!!注意：避免在同一环境中运行两个地址完全相同的蓝牙应用**
 
-   #. 此时可以在Keil环境里暂停/运行，设置断点，单步调试等。具体细节参见文档DEBUG环境
+   #. 可以在Keil环境里暂停/运行，设置断点，单步调试等。具体细节参见文档 :doc: `debug_env_and_tools`
       
-      注意：在BX2400里，某些特定状态下，Keil里无法执行上面的调试步骤，例如当IC在反复睡醒时，此时CPU处于关电状态，JLink无法连接到IC。
-
-2. Flash调试
-
-   Flash调试的前提是bin文件已经烧写入Flash中。关于如何烧写Flash，可以参考文档JFlash Tools
-
-   Flash调试的大部分步骤与RAM调试相同，唯一需要改变的是Debug选项的配置：
-      
-   .. image:: compiling_and_running_the_first_example_img9.png
-
-   在RAM中直接调试，初始化文件为debug.ini，而Flash调试的初始化文件为debug_flash.ini。
-
+      **!!!注意：在BX2400里，某些特定状态下，Keil里无法执行上面的调试步骤，例如当IC在反复睡醒时，此时CPU处于关电状态，JLink无法连接到IC。用户可以使能bx_sys_config.h中的宏DEBUGGER_ATTACHED，在此条件下编译生成的hex会跳过深睡眠的处理，保证在调试时用户的目标板可以连接到JLink**     
