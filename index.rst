@@ -12,6 +12,7 @@ Welcome to bx2400_sdk's documentation!
     
    getting_started
    hardware_drivers 
+   module/module
    hardware/pinshare
    ble_demos 
 	
