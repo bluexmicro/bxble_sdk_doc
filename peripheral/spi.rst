@@ -82,7 +82,9 @@ BX2400中SPIM和SPIS的管脚是固定的，不可任意配置。
     app_spi_receive(&spis_inst.inst,0,spis_rx_data,rx_length,spis_rx_cb,rx_cb_param);
     app_spi_transmit_receive(&spis_inst.inst,0,spis_tx_data,spis_rx_data,tx_rx_length,spis_tx_rx_cb,tx_rx_cb_param); // full duplex tx & rx
     
-收、发完成时，回调函数在中断处理上下文中被调用。
+收、发完成时，即SPI总线动作结束后，回调函数在中断处理上下文中被调用。
+
+对于同一个SPI实例，必须在一次传输完成后，才可以发起下一次传输，即发起一种SPI传输后，必须在收发完成，回调函数被调用的时刻之后，才可以再发起SPI传输。
 
 存储收发数据的缓冲区必须是动态或静态分配的全局数组，且在收发完成的回调函数被调用时，才能释放。
     

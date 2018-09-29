@@ -12,3 +12,4 @@ Hardware Drivers
     peripheral/iic
     peripheral/pwm
     peripheral/timer
+    peripheral/io_ctrl
