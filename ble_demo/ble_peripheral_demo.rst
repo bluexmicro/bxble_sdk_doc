@@ -50,72 +50,72 @@ ble peripheral demo
 _`ble 自定义 service`
 =======================
 
-参考ble_bx2400 simple service 创建模板
+参考ble bx simple service 创建模板
 ********************************************************
 
 **1. 定义自己的service 描述**
 
 .. code:: c
 
-	static const struct gattm_svc_desc bx24xx_simple_svc_desc = {
+	static const struct gattm_svc_desc bx_simple_svc_desc = {
 			.start_hdl = 0,
 			.task_id = TASK_ID_AHI,
 			.perm = PERM(SVC_MI,DISABLE)|PERM(SVC_EKS,DISABLE)|\
 				PERM(SVC_AUTH,NO_AUTH)|PERM(SVC_UUID_LEN,UUID_128),PERM_VAL(SVC_SECONDARY,0),
-			.nb_att = BX24XX_SIMPLES_ATT_NUM,
-			.uuid = BX24XX_SIMPLE_SVC_UUID_128,
+			.nb_att = BX_SIMPLES_ATT_NUM,
+			.uuid = BX_SIMPLE_SVC_UUID_128,
 	};
 
 **2. 定义自己的att 属性列表**
 
 .. code:: c
 
-	static const struct gattm_att_desc bx24xx_simple_svc_att_db[] =
+	static const struct gattm_att_desc bx_simple_svc_att_db[] =
 	{
 		// Characteristic1 Declaration
-		[BX24XX_SIMPLES_IDX_CHAR1_CHAR]        =   {
+		[BX_SIMPLES_IDX_CHAR1_CHAR]        =   {
 				.uuid = ATT_UUID16_TO_ARRAY(ATT_DECL_CHARACTERISTIC),
 				.perm = PERM(RD, ENABLE),
 				.max_len =0,
 				.ext_perm = PERM(UUID_LEN,UUID_16),
 		},
 		// Characteristic1 Value
-		[BX24XX_SIMPLES_IDX_CHAR1_VAL]         =   {
-				.uuid = BX24XX_SIMPLE_CHAR1_UUID_128,
+		[BX_SIMPLES_IDX_CHAR1_VAL]         =   {
+				.uuid = BX_SIMPLE_CHAR1_UUID_128,
 				.perm = PERM(WRITE_REQ,ENABLE)|PERM(WRITE_COMMAND,ENABLE)|PERM(WP,NO_AUTH)|PERM(RD, ENABLE)|PERM(RP,NO_AUTH),//write read
-				.max_len = BX24XX_SIMPLE_CHAR1_MAX_LEN,
+				.max_len = BX_SIMPLE_CHAR1_MAX_LEN,
 				.ext_perm = PERM(RI,ENABLE)|PERM(UUID_LEN, UUID_128),// if the char's perm has 'read',this must be set.  uuid 128
 		},
 		// Characteristic2 Declaration
-		[BX24XX_SIMPLES_IDX_CHAR2_CHAR]        =   {
+		[BX_SIMPLES_IDX_CHAR2_CHAR]        =   {
 				.uuid = ATT_UUID16_TO_ARRAY(ATT_DECL_CHARACTERISTIC),
 				.perm = PERM(RD, ENABLE),
 				.max_len =0,
 				.ext_perm = PERM(UUID_LEN,UUID_16),
 		},
 		// Characteristic2 Value
-		[BX24XX_SIMPLES_IDX_CHAR2_VAL]         =   {
-				.uuid = BX24XX_SIMPLE_CHAR2_UUID_128,
+		[BX_SIMPLES_IDX_CHAR2_VAL]         =   {
+				.uuid = BX_SIMPLE_CHAR2_UUID_128,
 				.perm = PERM(RD, ENABLE)|PERM(RP,NO_AUTH),//read
-				.max_len = BX24XX_SIMPLE_CHAR2_MAX_LEN,
+				.max_len = BX_SIMPLE_CHAR2_MAX_LEN,
 				.ext_perm = PERM(RI,ENABLE)|PERM(UUID_LEN, UUID_128),// if the char's perm has 'read',this must be set.  uuid 128
 		},
 		// Characteristic3 Declaration
-		[BX24XX_SIMPLES_IDX_CHAR3_CHAR]        =   {
+		[BX_SIMPLES_IDX_CHAR3_CHAR]        =   {
 				.uuid = ATT_UUID16_TO_ARRAY(ATT_DECL_CHARACTERISTIC),
 				.perm = PERM(RD, ENABLE),
 				.max_len =0,
 				.ext_perm = PERM(UUID_LEN,UUID_16),
 		},
 		// Characteristic3 Value
-		[BX24XX_SIMPLES_IDX_CHAR3_VAL]         =   {
-				.uuid = BX24XX_SIMPLE_CHAR3_UUID_128,
+		[BX_SIMPLES_IDX_CHAR3_VAL]         =   {
+				.uuid = BX_SIMPLE_CHAR3_UUID_128,
 				.perm = PERM(NTF, ENABLE)|PERM(NP,NO_AUTH),//notify
-				.max_len = BX24XX_SIMPLE_CHAR3_MAX_LEN,
+				.max_len = BX_SIMPLE_CHAR3_MAX_LEN,
 				.ext_perm = PERM(UUID_LEN, UUID_128),//uuid 128
 		},
 		// Client Characteristic Configuration Descriptor
-		[BX24XX_SIMPLES_IDX_CHAR3_CFG]      =   {
+		[BX_SIMPLES_IDX_CHAR3_CFG]      =   {
 				.uuid = ATT_UUID16_TO_ARRAY(ATT_DESC_CLIENT_CHAR_CFG),
 				.perm = PERM(RD, ENABLE) |PERM(WRITE_REQ, ENABLE),
 				.max_len =0,
@@ -127,47 +127,47 @@ _`ble 自定义 service`
 
 .. code:: c
 
-	static const gattServiceCBs_t bx24xx_simple_callbacks = {
-			.pfnReadAttrCB = ble_bx24xx_simple_read_callback,
-			.pfnWriteAttrCB = ble_bx24xx_simple_write_callback,
-			.pfnConnectCB = ble_bx24xx_simple_connect_callback,
-			.pfnHandlerInitCB = ble_bx24xx_simple_handler_init,
+	static const gattServiceCBs_t bx_simple_callbacks = {
+			.pfnReadAttrCB = ble_bx_simple_read_callback,
+			.pfnWriteAttrCB = ble_bx_simple_write_callback,
+			.pfnConnectCB = ble_bx_simple_connect_callback,
+			.pfnHandlerInitCB = ble_bx_simple_handler_init,
 	};
 
 **4. 实现外部应用服务添加接口**
 
 .. code:: c
 
-	int32_t ble_bx24xx_simple_add_svc(gattServiceCBs_t *cb)
+	int32_t ble_bx_simple_add_svc(gattServiceCBs_t *cb)
 	{
 		struct gattm_add_svc_req *req = AHI_MSG_ALLOC_DYN(GATTM_ADD_SVC_REQ,TASK_ID_GATTM,\
-			gattm_add_svc_req,sizeof(bx24xx_simple_svc_att_db));
+			gattm_add_svc_req,sizeof(bx_simple_svc_att_db));
 		struct gattm_svc_desc *svc = &req->svc_desc;
-		memcpy(svc,&bx24xx_simple_svc_desc,sizeof(bx24xx_simple_svc_desc));
-		memcpy(svc->atts,bx24xx_simple_svc_att_db,sizeof(bx24xx_simple_svc_att_db));
+		memcpy(svc,&bx_simple_svc_desc,sizeof(bx_simple_svc_desc));
+		memcpy(svc->atts,bx_simple_svc_att_db,sizeof(bx_simple_svc_att_db));
 
-		memcpy(cb,&bx24xx_simple_callbacks,sizeof(gattServiceCBs_t));
+		memcpy(cb,&bx_simple_callbacks,sizeof(gattServiceCBs_t));
 
-		LOG(LOG_LVL_INFO," svc ble_bx24xx_simple_add_svc \n");
-		return osapp_msg_build_send(req, sizeof(struct gattm_svc_desc)+sizeof(bx24xx_simple_svc_att_db));
+		LOG(LOG_LVL_INFO," svc ble_bx_simple_add_svc \n");
+		return osapp_msg_build_send(req, sizeof(struct gattm_svc_desc)+sizeof(bx_simple_svc_att_db));
 	}
 
 **5. 书写service应用的外部数据访问接口**
 
 .. code:: c
 
-	void ble_bx24xx_simple_char3_send_notification(uint8_t const *data,uint8_t length)
+	void ble_bx_simple_char3_send_notification(uint8_t const *data,uint8_t length)
 	{
 		static uint16_t notify_seq_num = 0;
 		struct gattc_send_evt_cmd *cmd= AHI_MSG_ALLOC_DYN(GATTC_SEND_EVT_CMD,TASK_ID_GATTC, gattc_send_evt_cmd, length);
 
-		if(bx24xx_simple_env.is_connect == IS_CONNECTED && char3_notify_cfg)
+		if(bx_simple_env.is_connect == IS_CONNECTED && char3_notify_cfg)
 		{
-			LOG(LOG_LVL_INFO,"ble_bx24xx_simple_char3_send_notification\n");
+			LOG(LOG_LVL_INFO,"ble_bx_simple_char3_send_notification\n");
 
 			cmd->operation = GATTC_NOTIFY;
 			cmd->seq_num = notify_seq_num++;
-			cmd->handle = start_handler + BX24XX_SIMPLES_IDX_CHAR3_CFG;
+			cmd->handle = start_handler + BX_SIMPLES_IDX_CHAR3_CFG;
 			cmd->length = length;
 			memcpy(cmd->value,data,length);
 
@@ -198,10 +198,10 @@ _`ble 角色设置`
 
 .. code:: c
 
-	/// BX24XX Peripheral Service Table
+	/// BX Peripheral Service Table
 	enum
 	{
-		BX24XX_SIMPLES_SERVICE_ID,
+		BX_SIMPLES_SERVICE_ID,
 
 
 		BLE_PERIPHERAL_SERVICES_NUM,
@@ -216,7 +216,7 @@ _`ble 角色设置`
 		memset(&peripheral_env, 0 , sizeof(ble_peripheral_simple_env_t));
 		peripheral_env.svc.max_num = BLE_PERIPHERAL_SERVICES_NUM;
 		peripheral_env.svc.index = 0;
-		peripheral_env.svc.handles[BX24XX_SIMPLES_SERVICE_ID] = ble_bx24xx_simple_add_svc;
+		peripheral_env.svc.handles[BX_SIMPLES_SERVICE_ID] = ble_bx_simple_add_svc;
 	}
 	
 **2. 设置设备的 角色设置**

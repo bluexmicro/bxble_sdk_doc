@@ -69,10 +69,10 @@ _`ble 角色设置`
 
 .. code:: c
 
-	/// BX24XX Central Service Table
+	/// BX Central Service Table
 	enum
 	{
-		PRF_BX24XX_SIMPLES_SERVICE_ID,
+		PRF_BX_SIMPLES_SERVICE_ID,
 
 
 		BLE_CENTRAL_SERVICES_NUM,
@@ -88,7 +88,7 @@ _`ble 角色设置`
 		memset(&central_env, 0 , sizeof(ble_central_env_t));
 		central_env.svc.max_num = BLE_CENTRAL_SERVICES_NUM;
 		central_env.svc.index = 0;
-		central_env.svc.handles[PRF_BX24XX_SIMPLES_SERVICE_ID] = ble_bx24xx_simple_prf_add_svc;
+		central_env.svc.handles[PRF_BX_SIMPLES_SERVICE_ID] = ble_bx_simple_prf_add_svc;
 	}
 
 	
