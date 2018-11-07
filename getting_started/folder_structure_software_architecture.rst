@@ -3,7 +3,7 @@
 
 1. 目录结构
 	 
-	 BX2400 SDK的根目录结构如下:
+	 Apollo SDK的根目录结构如下:
 	 
    .. image:: folder_structure_software_architecture_img1.png
 
@@ -15,7 +15,7 @@
 
       freertos下主要包含了FreeRTOS的源码，以及开发的一些demo。
    
-      app: 包含BX2400的一些demo。例如osapp_dis_server/osapp_dis_client是dis server/client的应用，分别在板子上跑起来手机可以对联；osapp_uart_server是串口透传的应用；osapp_1M2M_master/osapp_1M2M_slave是1M PHY和2M PHY来回切换的应用等。用户自己开发的BLE相关的应用程序，通常也在这个目录下。
+      app: 包含Apollo的一些demo。例如osapp_dis_server/osapp_dis_client是dis server/client的应用，分别在板子上跑起来手机可以对联；osapp_uart_server是串口透传的应用。用户自己开发的BLE相关的应用程序，通常也在这个目录下。
 
    #. ip
    
@@ -45,19 +45,19 @@
 				 
 			.. image:: folder_structure_software_architecture_img5.png				 
 
-      plf/debug文件夹下需要用户了解的是log文件夹，其中包含了Segger RTT的源码，已经BX2400对用户封装的打印信息接口。关于RTT的具体内容，参见文档 |Debug Environment & Tools|.
+      plf/debug文件夹下需要用户了解的是log文件夹，其中包含了Segger RTT的源码，已经Apollo对用户封装的打印信息接口。关于RTT的具体内容，参见文档 |Debug Environment & Tools|.
 			
-   #. plf/bx2400
+   #. plf/apollo_00
 	 
 	    .. image:: folder_structure_software_architecture_img6.png
 	    
-	    plf/bx2400下包含的BX2400系统的主要功能。其中用户需要关心的是main文件夹，这里包含了arch_main.c文件，其中有main函数的入口。在main调用之前的系统初始化函数system_init函数也同样在arch_main.c中。
+	    plf/apollo_00下包含的Apollo系统的主要功能。其中用户需要关心的是main文件夹，这里包含了arch_main.c文件，其中有main函数的入口。在main调用之前的系统初始化函数system_init函数也同样在arch_main.c中。
 	    
 	    关于其他文件夹，这里也做一个简单的介绍，希望帮助有深入了解需求的用户。
 			
       1. bootloader
       
-         bootloader下包含了boot_rom/boot_ram/boot_ram_download，分别表示ROM中的boot工程，RAM中的boot工程，以及从Uart boot的工程。BX2400的Boot包含从ROM到RAM的两部分，详见文档 |Boot introduction|.
+         bootloader下包含了boot_rom/boot_ram/boot_ram_download，分别表示ROM中的boot工程，RAM中的boot工程，以及从Uart boot的工程。Apollo的Boot包含从ROM到RAM的两部分，详见文档 |Boot introduction|.
       
       #. config
       
@@ -77,11 +77,11 @@
 
       #. patch_list
       
-         BX2400里使用的Patch文件。
+         Apollo里使用的Patch文件。
          
       #. peripheral_integration
       
-         外设驱动中与平台相关的文件。这里的外设和BX2400平台紧密相关，但和用户调用没有直接关系。
+         外设驱动中与平台相关的文件。这里的外设和Apollo平台紧密相关，但和用户调用没有直接关系。
 
       #. sleep
       
@@ -101,7 +101,7 @@
       
 #. 软件架构
 
-   BX2400集成了FreeRTOS，可以以带FreeRTOS/不带FreeRTOS两种方式支持用户应用开发。
+   Apollo集成了FreeRTOS，可以以带FreeRTOS/不带FreeRTOS两种方式支持用户应用开发。
 
    .. image:: folder_structure_software_architecture_img7.png
 
@@ -133,13 +133,13 @@
 
 #. 软件流程
 
-   在应用场景下，BX2400软件通常是从Flash启动，之后分两步将Flash里的软件代码搬移到RAM中，并跳转到RAM中运行。这里只讨论软件被搬移到RAM中后运行的流程，关于Boot流程，请参考文档 |Boot Procedure|.
+   在应用场景下，Apollo软件通常是从Flash启动，之后分两步将Flash里的软件代码搬移到RAM中，并跳转到RAM中运行。这里只讨论软件被搬移到RAM中后运行的流程，关于Boot流程，请参考文档 |Boot Procedure|.
 
    当软件跳转到RAM中运行后，大致经历了如下几个步骤：
 
-   #. Reset_handler() in startup_bx2400.s
+   #. Reset_handler() in startup_apollo_00.s
 
-      RAM中运行软件的入口就是Reset_handler()，其具体实现是在startup_bx2400.s中。Reset_handler()里做了两件事：一是调用System_init()，这个函数在arch_main.c中，对于用户来说需要关心的是这里做了中断向量表重定位，从默认的ROM重新设置的RAM中；二是调用__main(),这是ARM里负责跳转到main()的入口函数。在调用main()之前，__main()会根据链接脚本生成的记录，初始化所有RW段，清零所有ZI段，并负责处理Load Section和Exec Section地址不同的段的代码搬移。在全局数据/代码都准备就绪之后，__main()会自动跳转到main()中。关于链接脚本，详情参见文档 |Link Script & Keil SDK Config|.
+      RAM中运行软件的入口就是Reset_handler()，其具体实现是在startup_apollo_00.s中。Reset_handler()里做了两件事：一是调用System_init()，这个函数在arch_main.c中，对于用户来说需要关心的是这里做了中断向量表重定位，从默认的ROM重新设置的RAM中；二是调用__main(),这是ARM里负责跳转到main()的入口函数。在调用main()之前，__main()会根据链接脚本生成的记录，初始化所有RW段，清零所有ZI段，并负责处理Load Section和Exec Section地址不同的段的代码搬移。在全局数据/代码都准备就绪之后，__main()会自动跳转到main()中。关于链接脚本，详情参见文档 |Link Script & Keil SDK Config|.
 
    #. main() in arch_main.c
       
@@ -149,7 +149,7 @@
       
       2. BLE相关的初始化工作，modem初始化，modem参数校准，patch初始化，NVDS初始化，以及BLE IP的初始化等。
       
-      3. 全局中断使能。没有FreeRTOS则直接进入While循环，有FreeRTOS的情况下会通过rtos_task_init()初始化所有任务，并自动开始调度。自此，BX2400的软件全部启动完成，正式开始执行BLE和用户应用程序以及相关外设。
+      3. 全局中断使能。没有FreeRTOS则直接进入While循环，有FreeRTOS的情况下会通过rtos_task_init()初始化所有任务，并自动开始调度。自此，Apollo的软件全部启动完成，正式开始执行BLE和用户应用程序以及相关外设。
 
    #. FreeRTOS任务与内部消息处理
    
