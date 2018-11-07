@@ -7,7 +7,7 @@ Tools installation
 
     BX2400使用JLink的SWD作为基本调试工具，下载地址https://www.segger.com/downloads/jlink/ 
     
-    **!!!注意：必须是JLink V6以上版本，否则BX2400 SDK无法正常运行**
+    **!!!注意：必须是JLink V6以上版本，否则Apollo SDK无法正常运行**
     
     安装完成后，可以在设备管理器中找到对应的JLink驱动程序，插在PC上的JLink设备可以正确识别。
     
@@ -17,7 +17,7 @@ Tools installation
     
 #. Keil
 
-    BX2400使用Keil作为基本的调试IDE，用户需要自行安装功能完整的Keil
+    Apollo使用Keil作为基本的调试IDE，用户需要自行安装功能完整的Keil
     
 #. nRF Connect
 
