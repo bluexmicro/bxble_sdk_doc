@@ -50,7 +50,7 @@ ble peripheral demo
 _`ble 自定义 service`
 =======================
 
-参考ble_bx2400 simple service 创建模板
+参考ble_apollo simple service 创建模板
 ********************************************************
 
 **1. 定义自己的service 描述**
