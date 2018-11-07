@@ -1,11 +1,11 @@
-BX2400 IO and IO MUX
+Apollo IO and IO MUX
 ^^^^^^^^^^^^^^^^^^^^
 PAD ring
 --------
 General description
 >>>>>>>>>>>>>>>>>>>
 
-BX2400 has 27 general GPIOs(P0 to P13, P15 to P17, P20 to P29. **Please note that P14, P18 and P19 do not exist!**), one IO for external reset and one IO for test mode. Each of the 30 GPIOS has multiple functions which are defined by the pin share logic. The IO pads for the general GPIOs are all bi-directional IO PADs and have many programmable features. The block diagram of the GPIOs is shown below:
+Apollo has 27 general GPIOs(P0 to P13, P15 to P17, P20 to P29. **Please note that P14, P18 and P19 do not exist!**), one IO for external reset and one IO for test mode. Each of the 30 GPIOS has multiple functions which are defined by the pin share logic. The IO pads for the general GPIOs are all bi-directional IO PADs and have many programmable features. The block diagram of the GPIOs is shown below:
 
 .. image:: pad.png
 
@@ -33,7 +33,7 @@ The digital IOs are separated in 4 groups which can be programmed to different V
 IO MUX
 ------
 
-The IO mux table of BX2400 is shown below:
+The IO mux table of Apollo is shown below:
 
 +--------+--+---------------+---------------------------+-----------------------------------+-----------------------------+----------------------+
 |pad name|IO|func0          |func1                      |func2                              |func3                        |func4                 |
