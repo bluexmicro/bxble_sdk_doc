@@ -1,6 +1,6 @@
 ﻿Memory Map & Boot procedure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-BX2400的存储区域地址映射，需要从三个角度进行说明：Flash可执行文件的结构，Image结构和运行时地址映射。三者关系如下：
+Apollo的存储区域地址映射，需要从三个角度进行说明：Flash可执行文件的结构，Image结构和运行时地址映射。三者关系如下：
 
     .. image:: memory_map_img0.png
 
@@ -12,11 +12,11 @@ BX2400的存储区域地址映射，需要从三个角度进行说明：Flash可
 
     1. Flash可执行文件
         
-        Flash可执行文件指的是在在BX2400 SDK里编译链接，最后通过bin_merge生成的flash.hex，也是最终烧写入Flash中的二进制文件。如上图所示，包括Boot_in_ram, image0/image1和NVDS区域。
+        Flash可执行文件指的是在在Apollo SDK里编译链接，最后通过bin_merge生成的flash.hex，也是最终烧写入Flash中的二进制文件。如上图所示，包括Boot_in_ram, image0/image1和NVDS区域。
 
-         - 2nd bootloader: 表示BX2400启动的第二段流程（第一段软件启动流程1st bootloader在ROM里）可执行代码
+         - 2nd bootloader: 表示Apollo启动的第二段流程（第一段软件启动流程1st bootloader在ROM里）可执行代码
 
-         - image0/image1: 表示BX2400里包含用户代码和数据的二进制映像。之所以有两个image，主要是针对有OTA需求的用户应用
+         - image0/image1: 表示Apollo里包含用户代码和数据的二进制映像。之所以有两个image，主要是针对有OTA需求的用户应用
 
          - NVDS区域: NVDS0/NVDS1包含存储在Flash里和IC相关的配置相关数据。两个NVDS是为了从应用的角度尽量延长Flash的使用寿命，防止Flash因为某些频繁操作Flash的擦写动作而损坏
 
@@ -43,7 +43,7 @@ BX2400的存储区域地址映射，需要从三个角度进行说明：Flash可
 
     #. Image结构
 
-        Image里主要内容是用户在BX2400 SDK里编译链接得到的可执行文件，外加一个Boot需要的头结构。
+        Image里主要内容是用户在Apollo SDK里编译链接得到的可执行文件，外加一个Boot需要的头结构。
         
         image header里的内容为IC boot提供足够的信息，例如Flash单线/双线/四线选择，Flash电压，image的大小以及image的版本等。通常情况下用户不需要关心这里的细节。
         
@@ -77,7 +77,7 @@ BX2400的存储区域地址映射，需要从三个角度进行说明：Flash可
 
     #. 运行时地址映射
 
-        在BX2400完成启动后，软件开始运行，参与运行的物理区域包括ROM, RAM和Flash(可选)：
+        在Apollo完成启动后，软件开始运行，参与运行的物理区域包括ROM, RAM和Flash(可选)：
         
          - ROM
          
@@ -115,11 +115,11 @@ BX2400的存储区域地址映射，需要从三个角度进行说明：Flash可
         |             |                   | Other contents in Flash |
         +-------------+-------------------+-------------------------+
 
-#. BX2400启动流程
+#. Apollo启动流程
 
     .. image:: memory_map_img1.png
 
-    BX2400的启动是从ROM开始，分为1st bootloader和2nd bootloader两部分。BX2400的Boot分为Boot from Flash和Boot from Uart两种，分别对应正常用户启动模式和量产模式。由于二者工作机制类似，此处重点介绍前者。
+    Apollo的启动是从ROM开始，分为1st bootloader和2nd bootloader两部分。Apollo的Boot分为Boot from Flash和Boot from Uart两种，分别对应正常用户启动模式和量产模式。由于二者工作机制类似，此处重点介绍前者。
     
     - 1st step: 当IC上电时，CPU会自动运行1s bootloader，也就是ROM中起始地址之后的那一部分可执行代码。这部分代码里，会去检测Boot模式，以及对应IO的启动电压。假设此处检测到需要Boot from Flash，且电压为1.8V，bootloader会将Flash对应的IO电压配置为1.8V，之后尝试去Flash中一个固定的位置去读取2nd bootloader
     
