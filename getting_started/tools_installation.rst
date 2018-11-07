@@ -5,7 +5,7 @@ Tools installation
 
 1. JLink
 
-    BX2400使用JLink的SWD作为基本调试工具，下载地址https://www.segger.com/downloads/jlink/ 
+    Apollo使用JLink的SWD作为基本调试工具，下载地址https://www.segger.com/downloads/jlink/ 
     
     **!!!注意：必须是JLink V6以上版本，否则Apollo SDK无法正常运行**
     
