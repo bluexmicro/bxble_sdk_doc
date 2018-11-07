@@ -157,7 +157,7 @@
 
       .. image:: folder_structure_software_architecture_img8.png
 
-      1. 表示应用程序通过APP任务给BLE任务发送上层命令，例如开始发送adv包，和某个设备建立连接，向对端传送数据等。协议栈里向上提供AHI(Advanced HCI Interface)接口，应用程序向协议栈发送命令和接收数据时都是AHI角色。
+      1. 表示应用程序通过APP任务给BLE任务发送上层命令，例如开始发送adv包，和某个设备建立连接，向对端传送数据等。协议栈里向上提供AHI(App Host Interface)接口，应用程序向协议栈发送命令和接收数据时都是AHI角色。
       
       #. BLE任务收到APP任务发送过来的命令后，会通过os_bridge和软中断接口，调用内部模块解析APP命令。解析之后会根据命令内容将命令转发给协议栈内部不同的任务。这里的任务不同于APP和BLE任务，它们是协议栈内部的核心任务，用户不可见。
       
