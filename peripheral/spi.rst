@@ -55,7 +55,7 @@ SPI
         app_spi_init(&spis_inst.inst);
     }
     
-BX2400中SPIM和SPIS的管脚是固定的，不可任意配置。
+Apollo中SPIM和SPIS的管脚是固定的，不可任意配置。
 
 数据对齐要求：
 

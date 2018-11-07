@@ -2,7 +2,7 @@
 IO_CTRL
 =======
 
-在BX2400系统中，IO的控制由内部的pin_share逻辑控制，若某IO被映射为外设的管脚，则该IO动作受外设模块逻辑控制；若未被映射为外设管脚，则IO动作受GPIO模块控制，关系如下图所示。
+在Apollo系统中，IO的控制由内部的pin_share逻辑控制，若某IO被映射为外设的管脚，则该IO动作受外设模块逻辑控制；若未被映射为外设管脚，则IO动作受GPIO模块控制，关系如下图所示。
 
 .. image:: img/io_ctrl.png
 
@@ -18,7 +18,7 @@ IO_CTRL
         #include "io_ctrl.h"   
         io_init();
     
-    BX2400系统已经自动执行过上述初始化，用户无需再次初始化。
+    Apollo系统已经自动执行过上述初始化，用户无需再次初始化。
     
 
 #. 设置IO输入、输出方向
@@ -91,4 +91,4 @@ IO_CTRL
         只有GPIO15、GPIO16、GPIO17、GPIO22、GPIO23支持外部中断，即pin_num只可以是15、16、17、22、23。
         
     
-详细API介绍参见SDK目录plf/bx2400/src/sys_integration/sysctrl/io_ctrl.h
+详细API介绍参见SDK目录plf/Apollo_00/src/sys_integration/sysctrl/io_ctrl.h
