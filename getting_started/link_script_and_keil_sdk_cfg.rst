@@ -1,7 +1,7 @@
 Link Script & Keil SDK Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-在Keil下编译链接BX2400 SDK，需要熟悉Keil下的各项工程配置。
+在Keil下编译链接Apollo SDK，需要熟悉Keil下的各项工程配置。
 
 1.  链接脚本
 
@@ -13,7 +13,7 @@ Link Script & Keil SDK Configuration
 
     .. image:: link_script_and_keil_sdk_cfg_img2.png
 
-    ARM的链接脚本的主要构成是Load Section和Exec Section。考虑一个典型的Flash上运行软件的例子：IC从Flash启动，之后需要要把所有的数据和一部分代码搬移到RAM中（例如Flash驱动，中断向量表，任务调度函数等，没办法放在Flash中），此时IC启动后ARM默认的__main()需要知道代码搬移的起始地址和目的地址，这就是通过链接脚本指定的。起始地址就是Load Section，而目标地址就是Exec Section。 BX2400的链接脚本范例如下:
+    ARM的链接脚本的主要构成是Load Section和Exec Section。考虑一个典型的Flash上运行软件的例子：IC从Flash启动，之后需要要把所有的数据和一部分代码搬移到RAM中（例如Flash驱动，中断向量表，任务调度函数等，没办法放在Flash中），此时IC启动后ARM默认的__main()需要知道代码搬移的起始地址和目的地址，这就是通过链接脚本指定的。起始地址就是Load Section，而目标地址就是Exec Section。 Apollo的链接脚本范例如下:
 
     ..  code:: c
 
@@ -61,7 +61,7 @@ Link Script & Keil SDK Configuration
             }
         }
 
-    这里主要包括3个Load Section，每个Load Section又包含了数目不同的Exec Section。以第一个Load Section为例，LR_RAM1表示Load Section的名字，RAM_BASE表示Load Section的起始地址，ALIGN 0x80则表示起始地址必须是0x80对齐。ISR_VECTOR是第一个Exec Section的名字，+0表示起始地址相对之前的Load Section LR_RAM1的偏移是0，也就是说地址相同。*(RESET, +First)和*(jump_table_area)则表示该Exec Section的两个输入，第一个输入是在汇编里定义的段，具体参考源文件startup_bx2400.s，第二个输入是C源代码里定义的jump_table_area段。第二种很常用，其在C代码中的写法是：
+    这里主要包括3个Load Section，每个Load Section又包含了数目不同的Exec Section。以第一个Load Section为例，LR_RAM1表示Load Section的名字，RAM_BASE表示Load Section的起始地址，ALIGN 0x80则表示起始地址必须是0x80对齐。ISR_VECTOR是第一个Exec Section的名字，+0表示起始地址相对之前的Load Section LR_RAM1的偏移是0，也就是说地址相同。*(RESET, +First)和*(jump_table_area)则表示该Exec Section的两个输入，第一个输入是在汇编里定义的段，具体参考源文件startup_apollo_00.s，第二个输入是C源代码里定义的jump_table_area段。第二种很常用，其在C代码中的写法是：
 
     ..  code:: c
 
@@ -88,7 +88,7 @@ Link Script & Keil SDK Configuration
 
         .. image:: link_script_and_keil_sdk_cfg_img4.png
 
-        关于Group/Files内容，BX2400更新后与图片显示不同，具体以SDK内容为准。
+        关于Group/Files内容，Apollo更新后与图片显示不同，具体以SDK内容为准。
 
     #.  工程管理选项
 
@@ -96,19 +96,19 @@ Link Script & Keil SDK Configuration
 
             .. image:: link_script_and_keil_sdk_cfg_img5.png
 
-            BX2400内的MCU为Cortex-M0+。
+            Apollo内的MCU为Cortex-M0+。
 
         -   Target配置
 
             .. image:: link_script_and_keil_sdk_cfg_img6.png
 
-            Target里主要配置ROM和RAM的地址以及大小。关于RAM中的具体内容，请参考文档Memory Distribution. 另外，BX2400使用MicroLIB，因此相应的选项也需要选中。
+            Target里主要配置ROM和RAM的地址以及大小。关于RAM中的具体内容，请参考文档Memory Distribution. 另外，Apollo使用MicroLIB，因此相应的选项也需要选中。
 
         -   Output选项
 
             .. image:: link_script_and_keil_sdk_cfg_img7.png
 
-            Output选项里，主要配置输出的文件信息。BX2400里的配置，尽可能输出更多的信息方便调试。BX2400里不需要hex文件，用户如果需要可以选择生成。
+            Output选项里，主要配置输出的文件信息。Apollo里的配置，尽可能输出更多的信息方便调试。Apollo里不需要hex文件，用户如果需要可以选择生成。
 
         -   Listing选项
 
@@ -120,13 +120,13 @@ Link Script & Keil SDK Configuration
 
             .. image:: link_script_and_keil_sdk_cfg_img9.png
 
-            User选项里，主要配置了在生成可执行文件后，需要执行的自定义命令，这里主要有2个：#1是使用fromelf命令从axf文件中生成bin文件；#2是利用自定义的bin_merge.exe生成flash.bin文件。用户最终需要生成一个可以烧写入Flash里的bin文件，这个文件就是通过这里的After Build命令生成。
+            User选项里，主要配置了在生成可执行文件后，需要执行的自定义命令，这里主要有2个：#1是一个批处理文件，其内容包括用fromelf命令从axf文件中生成bin文件和反汇编asm文件；#2是利用自定义的bin_merge.exe生成flash.bin文件。用户最终需要生成一个可以烧写入Flash里的bin文件，这个文件就是通过这里的After Build命令生成。
 
         -   C/C++选项
 
             .. image:: link_script_and_keil_sdk_cfg_img10.png
 
-            C/C++选项里，最需要关注的是配置头文件路径。BX2400已经默认配置好需要的路径，用户如果增加了自定义的头文件目录，需要在这里添加到列表中，否则编译时会报错。其余的配置保持默认值即可。
+            C/C++选项里，最需要关注的是配置头文件路径。Apollo已经默认配置好需要的路径，用户如果增加了自定义的头文件目录，需要在这里添加到列表中，否则编译时会报错。其余的配置保持默认值即可。
 
         -   Asm选项
 
@@ -140,13 +140,13 @@ Link Script & Keil SDK Configuration
 
             关于链接脚本的具体内容，可以参考文档Link scripts/Keil SDK Config
 
-            BX2400包含ROM，因此在用户程序链接的时候，需要引用符号表，也就是rom_syms_armcc.txt，这个文件已经包含在工程目录中，用户一般不需要关心。
+            Apollo包含ROM，因此在用户程序链接的时候，需要引用符号表，也就是rom_syms_armcc.txt，这个文件已经包含在工程目录中，用户一般不需要关心。
 
         -   Debug选项
 
             .. image:: link_script_and_keil_sdk_cfg_img12.png
 
-            Debug选项里，左半边面板属于Simulator下的配置选项，用户不需要关心。右侧的选项中，需要注意的是初始化文件。BX2400 SDK里有两个ini文件：debug.ini和debug_flash.ini，分别代表软件代码直接在RAM中调试，和从Flash启动再到跳转到RAM中运行的选项。关于两种调试方式的选择，通常建议如下：
+            Debug选项里，左半边面板属于Simulator下的配置选项，用户不需要关心。右侧的选项中，需要注意的是初始化文件。Apollo SDK里有两个ini文件：debug.ini和debug_flash.ini，分别代表软件代码直接在RAM中调试，和从Flash启动再到跳转到RAM中运行的选项。关于两种调试方式的选择，通常建议如下：
 
             -   直接下载到RAM中调试：在用户开发前中期，BLE的主要功能未调试完成，不太关注Flash相关的操作时。此时配置初始化文件debug.ini
 
