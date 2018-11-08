@@ -7,7 +7,7 @@ NVDS是FLASH中保存系统、用户数据的区域。例如蓝牙设备地址�
 NVDS TAG
 ---------
 
-在NVDS中，数据以标签Tag的形式存储，每一Tag中，包含该Tag的大小、名称、状态、数据内容等所有信息。BX2400为开发者提供了在C源代码中直接编辑NVDS数据的方法。如果在NVDS中增加新的Tag，需要分别在modules/nvds/api/nvds_tag.h下声明新的Tag结构体，在modules/nvds/src/nvds_tag.c下定义新的Tag数据内容。
+在NVDS中，数据以标签Tag的形式存储，每一Tag中，包含该Tag的大小、名称、状态、数据内容等所有信息。Apollo为开发者提供了在C源代码中直接编辑NVDS数据的方法。如果在NVDS中增加新的Tag，需要分别在modules/nvds/api/nvds_tag.h下声明新的Tag结构体，在modules/nvds/src/nvds_tag.c下定义新的Tag数据内容。
 
 例如，定义名为BX_USR_TAG0的Tag，其中保存2个uint32_t类型的数据，步骤如下：
 
@@ -79,7 +79,7 @@ NVDS中存储的Tag结构如下：
 NVDS访问策略
 ------------
 
-NVDS利用FLASH存储数据，因此NVDS数据的读、写、删都要建立在FLASH的工作特性上。与BX2400搭配的是常见的Nor FLASH，Nor FLASH一般支持随机读取、按Sector擦除以及擦除后烧写，因此NVDS数据的写、删是完全不同于内存SRAM数据的写、删的。
+NVDS利用FLASH存储数据，因此NVDS数据的读、写、删都要建立在FLASH的工作特性上。与Apollo搭配的是常见的Nor FLASH，Nor FLASH一般支持随机读取、按Sector擦除以及擦除后烧写，因此NVDS数据的写、删是完全不同于内存SRAM数据的写、删的。
 
 NVDS Tag的删除采用标记形式。程序映像创建时，NVDS Tag中的Label被初始化为0xff，若要删除该Tag，则将FLASH中该Tag的Label中的Valid bit写0。
 
