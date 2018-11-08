@@ -1,7 +1,7 @@
 Flash programming guide using JFlash
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-BX2400支持通过JFlash读写Flash。在操作之前，需要下载JLink(V6版本以上，`JLink下载`_)并安装，之后按照如下步骤操作：
+Apollo支持通过JFlash读写Flash。在操作之前，需要下载JLink(V6版本以上，`JLink下载`_)并安装，之后按照如下步骤操作：
     
     .. _JLink下载: https://www.segger.com/downloads/jlink/
 
@@ -15,7 +15,7 @@ BX2400支持通过JFlash读写Flash。在操作之前，需要下载JLink(V6版�
 
     .. image:: flash_programming_guide_using_jflash_img0.png
 
-    - 第一次打开JFlash，需要通过other选择.jflash文件，在BX2400 SDK的tools\prog_tool目录下，用户需要根据Flash的工作电压选择对应的.jflash文件
+    - 第一次打开JFlash，需要通过other选择.jflash文件，在Apollo SDK的tools\prog_tool目录下，用户需要根据Flash的工作电压选择对应的.jflash文件
  
     - 选择对应的.jflash文件后，打开，在JFlash的Project对话框中能看到该.jflash内部一些配置，比如SWD速度配置，CPU类型，大小端类型，RAM地址等。这些配置在JFlash中已经默认配置完成，用户通常不需要手动更改
  

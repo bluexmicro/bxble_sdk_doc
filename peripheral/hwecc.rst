@@ -17,7 +17,7 @@ HWECC
     #include "app_hwecc_wrapper.h"
     app_hwecc_init_wrapper();
     
-BX2400系统已经自动执行过上述初始化，用户无需再次初始化。
+Apollo系统已经自动执行过上述初始化，用户无需再次初始化。
     
 2. ECC计算
 

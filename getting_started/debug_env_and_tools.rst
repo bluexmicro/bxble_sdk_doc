@@ -1,7 +1,7 @@
 Debug Environment and Tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-BX2400使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出错时通过HardFault中断进行错误定位。
+Apollo使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出错时通过HardFault中断进行错误定位。
 
 1. DEBUG环境/debug_flash.ini
 
@@ -15,7 +15,7 @@ BX2400使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出
 
    debug_flash.ini文件是在Keil在debug时的配置文件，Keil会根据debug_flash.ini的内容决定如果下载可执行文件，以及后续的动作。debug_flash.ini的内容是：
    
-      LOAD .\Objects\BX2400.axf NOCODE
+      LOAD .\\Objects\\Apollo_00.axf NOCODE
 
    可以看到debug_flash.ini下载可执行文件的指令，且有NOCODE标志，表示只是将将调试信息装载进来，但并不下载任何实质性的数据/指令到开发板，这种调试模式运行的前提，是用户需要事先将生成的hex/bin文件烧写入Flash中，之后用户程序会从Flash启动开始走完整的流程。
 
@@ -31,7 +31,7 @@ BX2400使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出
 
       当暂停应用程序运行时，可以在代码窗口里看到当前C语言指令运行的位置，在反汇编窗口里能看到相对应的汇编指令。
 
-      注意：对于BX2400工程来说，并非所有应用都可以暂停再运行。当应用程序里有一些与定时器相关操作时，暂停程序的运行会导致不可预知的错误。例如，当BX2400与另一个蓝牙设备建立连接后，暂停程序的运行会导致CPU无法及时处理蓝牙Mac相关的中断请求和定时器任务，连接通常都会中断，即便继续运行也无法恢复。
+      注意：对于Apollo工程来说，并非所有应用都可以暂停再运行。当应用程序里有一些与定时器相关操作时，暂停程序的运行会导致不可预知的错误。例如，当Apollo与另一个蓝牙设备建立连接后，暂停程序的运行会导致CPU无法及时处理蓝牙Mac相关的中断请求和定时器任务，连接通常都会中断，即便继续运行也无法恢复。
 
    #. 断点
 
@@ -91,7 +91,7 @@ BX2400使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出
 
 #. Segger RTT/Log输出
 
-   RTT是Segger在借鉴了SWO和SemiHost的基础上，提供的一种嵌入式交互技术。根据Segger的介绍，RTT可以在不影响CPU运行的前提下，实现微处理器的输入输出。在BX2400里，只使用了信息输出这一种功能。
+   RTT是Segger在借鉴了SWO和SemiHost的基础上，提供的一种嵌入式交互技术。根据Segger的介绍，RTT可以在不影响CPU运行的前提下，实现微处理器的输入输出。在Apollo里，只使用了信息输出这一种功能。
 
    .. image:: debug_env_and_tools_img9.png
 
@@ -137,7 +137,7 @@ BX2400使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出
 
    HardFault是ARM 处理器中常见且有用的错误中断。当CPU遇到一些硬件异常，例如指令异常，总线出错，空指针等，HardFault中断会触发。在中断触发时，会将导致错误中断产生时的一些CPU寄存器压入当前栈中，同时将EXC_RETURN写入LR,以表明中断类型。关于EXC_RETURN的内容，可以参考ARM Cortex-M权威指南中的相关内容。
 
-   在BX2400中，会有HardFault处理函数来专门处理这一部分内容，具体的软件代码在HardFault_Handler_C函数中。该函数的主要内容就是将HardFault压栈的寄存器dump出来，并通过RTT打印，以帮助用户快速定位异常的触发位置。
+   在Apollo中，会有HardFault处理函数来专门处理这一部分内容，具体的软件代码在HardFault_Handler_C函数中。该函数的主要内容就是将HardFault压栈的寄存器dump出来，并通过RTT打印，以帮助用户快速定位异常的触发位置。
 
    注意：在压栈的寄存器里，最常用最重要的两个通常是PC和LR. PC可以告诉用户异常触发时的PC值，但是如果软件出现指针异常，PC值有可能是一个非法值，基本没有参考意义。这时就需要通过LR来定位软件异常所在。根据CMSIS调用规则，在函数调用时LR通常会被压栈，然后更新为被调用函数返回的下一条指令地址，而当函数退出时，压栈的LR会弹出到PC中。因此LR通常不会像PC一样被异常修改，可以持续可靠的跟踪函数的调用流程。
 
