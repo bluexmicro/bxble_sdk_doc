@@ -63,5 +63,16 @@ src的地址的对齐要求由src_tr_width决定，即src_tr_width == Transfer_W
 
     app_dmac_transfer_wait_wrapper(ch_idx);
     
+4. 取消传输
+
+.. code:: c
+
+    uint32_t remaining_length = app_dmac_transfer_cancel_wrapper(ch_idx);
+    
+返回值 == 启动传输时设定的长度 - 调用app_dmac_transfer_cancel_wrapper时实际收到的数据长度。
+
+    .. note::
+
+        若src_tr_width<dst_tr_width，取消传输得到的返回值可能有误，即数据有可能在DMA传输过程中丢失。
 
 
