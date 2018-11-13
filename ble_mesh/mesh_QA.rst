@@ -61,7 +61,7 @@
 
 * **[Q]** How to turn on relay feature?
 
-* **[A]** You can refer this file "SDK_v1_0_2325\freertos\app\mesh\examples\simple_generic_onoff_server\mesh_app_hal.c" ,the function "hal_button4_cb" is open the relay feature.
+* **[A]** You can refer this file "SDK_v1_0_2325\\freertos\\app\\mesh\\examples\\simple_generic_onoff_server\\mesh_app_hal.c" ,the function "hal_button4_cb" is open the relay feature.
 
 \-----------------------------------------------------------   
 
