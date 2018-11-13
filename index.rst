@@ -16,7 +16,6 @@ Welcome to Apollo SDK documentation!
    hardware/pinshare
    ble_demos
    ble_mesh
-   Q_A
 	
 
 Indices and tables
