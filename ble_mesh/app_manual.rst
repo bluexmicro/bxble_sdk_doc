@@ -20,7 +20,7 @@ APP manual
 
       .. image:: img/appmanual_3.png
          :scale: 40%         
-* **5** after  press the “IDENTIFY”,the button name change to “provision”
+* **5** after  press the “IDENTIFY”,the button name change to “provision”,and press the  "provision" button to enter provision procdure.
 
      .. image:: img/appmanual_4.png
         :scale: 40% 

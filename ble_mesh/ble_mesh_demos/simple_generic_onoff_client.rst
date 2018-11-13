@@ -32,7 +32,7 @@ _`示例功能简介`
 * 设备支持mesh proxy，可以通过手机，经gatt连接快速配置入网。
 
 
-* 节点上有两个generic onoff clent，可以通过手机单独控制任一 client。
+* 节点上有两个generic onoff clent，可以通过手机单独配置client的pub/sub。
 
 
 * 可以跟onoff server 配合，设置 client 的 publication 功能来控制server 的灯开关。
