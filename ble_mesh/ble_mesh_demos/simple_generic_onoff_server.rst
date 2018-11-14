@@ -1,5 +1,5 @@
 ==============================================
-simple generic onoff server demo
+simple generic onoff server with relay demo
 ==============================================
 
 
@@ -41,6 +41,9 @@ _`示例功能简介`
 * 节点支持relay可控，可以手动打开或关闭relay，便于部署。
 
 
+* 节点支持proxy server beacon 可控，可以手动打开或关闭该beacon，便于部署。
+
+
 _`示例运行概要`
 ===================
 
@@ -51,16 +54,18 @@ ________________________________________________________________________________
 
 * 按键
 
-  botton 3 : **单击** 设备 **关闭** relay功能，指示灯1 绿灯熄灭
-
-  botton 4 : **单击** 设备 **打开** relay功能，指示灯1 绿灯常亮
-
+  botton 3  button 4 同时按下 ，心跳灯会快闪，设备重启并重新初始化，该操作会丢弃所有之前配置，设备变成unprovision 状态
+  
+* PIN 
+  PIN 7 8  短路 ：  relay 功能打开，LED2 蓝灯亮
+  PIN 10 11短路 ：  延迟一分钟后 关闭proxy server beacon 功能打开，LED1红灯亮
+  
 * 指示灯
 
   * led1 : 
   	 * 绿灯   
-                * 熄灭， 设备relay 功能关闭；
-                * 常亮， 设备relay 功能打开；
+                * 熄灭， 设备proxy server beacon 功能打开；
+                * 常亮， 设备proxy server beacon 功能关闭；
   	 * 蓝灯   
                 * 熄灭， generic onoff server **1** 设置关闭；
                 * 常亮， generic onoff server **1** 设置打开；
@@ -72,15 +77,15 @@ ________________________________________________________________________________
                 * 闪烁， 设备正常工作；
                 * 常亮/长灭， 设备异常；
   	 * 蓝灯   
-                * 熄灭， 保留；
-                * 常亮， 保留；
+                * 熄灭， relay 功能关闭；
+                * 常亮， relay 功能打开；
 	 * 红灯  
                 * 熄灭， generic onoff server **2** 设置关闭；
                 * 常亮， generic onoff server **2** 设置打开；
 
 软件环境
 ********************************
-* 设备端运行 ble mesh sdk 的 examples 目录下 simple_generic_onoff_s示例。
+* 设备端运行 ble mesh sdk 的 examples 目录下 simple_generic_onoff_server_with_relay示例。
 * 手机端运行 任意厂商符合mesh标准的app。
 
 软件运行流程
@@ -101,7 +106,7 @@ ________________________________________________________________________________
 	void mesh_user_main_init(void)
 	{
 		///user data init
-	    simple_generic_onff_server_init();
+	    simple_generic_onff_server_with_relay_init();
 
 		LOG(LOG_LVL_INFO,"mesh_user_main_init\n");
 	}
@@ -111,7 +116,7 @@ ________________________________________________________________________________
 设备正常上电后： 
   * led1 : 
   	 * 绿灯   
-                * 熄灭， 设备relay 功能默认关闭；
+                * 熄灭， 设备proxy server beacon 功能默认打开；
   	 * 蓝灯   
                 * 常亮， generic onoff server **1** 默认设置打开；
 	 * 红灯  
@@ -120,7 +125,7 @@ ________________________________________________________________________________
   	 * 绿灯   
                 * 闪烁， 设备正常工作；
   	 * 蓝灯   
-                * 熄灭， 保留；
+                * 熄灭， relay 功能默认关闭；
 	 * 红灯  
                 * 常亮， generic onoff server **2** 默认设置打开；
 
