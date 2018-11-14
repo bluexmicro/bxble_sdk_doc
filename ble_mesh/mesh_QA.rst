@@ -65,8 +65,36 @@
 
 \-----------------------------------------------------------   
 
+* **[Q]** 如何提高多个节点传输的速度？
+
+* **[A]** 主要和 transmite count 和 interval 两个参数有关，需要根据实际情况调试这两个参数。
+
+* 首先介绍一下transmite count 和 interval 两个参数。
+* 该参数定义在example目录下，“sdk_mesh_config_pro.h”文件中。
 
 
+.. code:: c
+
+    #define TRANSMIT_DEFAULT_COUNT                  5   ///send 6 times  (count + 1)
+    #define TRANSMIT_DEFAULT_INTERVAL               10  ///interval = step*10 ms
+    #define TRANSMIT_DEFAULT_RELAY_COUNT            6   ///send 7 times
+    #define TRANSMIT_DEFAULT_RELAY_INTERVAL         10  ///interval = step*10 ms
+
+* 其中COUNT结尾的参数，就是一个ADV包需要重复的次数。数值为6就意味着重发5次，一共发送6次。
+* 其中INTERVAL结尾的参数，就是一个两个ADV数据包之间的时间间隔，单位是10ms，参数为10就意味着100ms发送一次。（系统会在此基础上增加0-40ms额外随机延时。）
+* 队列中的ADV数据包会排队发送，第一个发完之后去发送第二个。以此类推。
+* TRANSMIT_DEFAULT 参数为本节点自身发出去的ADV数据包的特性。
+* TRANSMIT_DEFAULT_RELAY 参数为本节点relay出去的ADV数据包的特性。
+* 重发次数越多，丢包率越低，重发次数越少，丢包率越高。
+* 如果想加快发送速度，可以减小这四个参数的数值，可以缩短总的发送时间，让发送速度更快。但是代价就是重发次数少，会导致丢包率增加。
+
+\-----------------------------------------------------------   
+
+* **[Q]** 如何判断是否要开启relay功能？
+
+* **[A]** 通常来说，节点越密集，relay节点可以越少。节点越分散，relay节点越多。需要根据实际应用场景去调试是否开启relay功能。
+
+\-----------------------------------------------------------   
 
 
 
