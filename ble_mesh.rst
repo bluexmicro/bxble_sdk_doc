@@ -13,4 +13,4 @@ BLE Mesh
     ble_mesh/debug_user_client_model 
     ble_mesh/app_manual 
     ble_mesh/mesh_QA 
-	
+	ble_mesh/mesh_features 
