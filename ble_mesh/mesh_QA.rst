@@ -100,8 +100,12 @@
 
 * **[A]** APP重置网络有两种，一种是reset node, 一种是reset network。
         reset node如下图所示
+        
        .. image:: mesh_QA_img/reset_node.png
+       
+       
         reset_network如下图所示
+        
        .. image:: mesh_QA_img/reset_network.png
        
        reset node ：
