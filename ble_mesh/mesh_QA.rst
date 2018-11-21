@@ -99,20 +99,21 @@
 * **[Q]** APP重置网络的问题。
 
 * **[A]** APP重置网络有两种，一种是reset node, 一种是reset network。
-        reset node如下图所示
+
+reset node如下图所示
         
        .. image:: mesh_QA_img/reset_node.png
        
        
-        reset_network如下图所示
+reset_network如下图所示
         
        .. image:: mesh_QA_img/reset_network.png
        
-       reset node ：
+reset node ：
        
        是像该节点发送reset消息，让该节点回复unprovisoin 状态，同时APP移除节点。此时APP可以再次入网该设备
        
-       reset network ：
+reset network ：
        是APP强制删除所有显示的节点，APP刷新各种key。但是不向节点发送任何消息，所以节点仍然处于已入网状态。无法再次进行入网，由于APP清除了节点，所以无法再次控制。
        
        节点必须erase擦除重新烧录，或者在Mesh Dongle同时按下两个黑色按钮5秒钟（按下之后会自动擦除数据），之后才可以重新入网节点。
