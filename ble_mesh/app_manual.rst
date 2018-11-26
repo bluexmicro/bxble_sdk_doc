@@ -58,4 +58,39 @@ APP manual
      .. image:: img/appmanual_12.png
         :scale: 40%
         
+=================
+Advance Feature:
+=================
+        
+* **11** Subscribe feature config :  Subscribe Addr can be a unicast address or group address . press  the sub button to config .
+
+     .. image:: img/appmanual_13.png
+        :scale: 40%
+        
+* **12**  After  config finished , you can press “ON” or “OFF” to control .
+
+     .. image:: img/appmanual_14.png
+        :scale: 40%
+
+        
+* **13**  Publish feature allow node to publish status or cmd to notify other node that subscribe the publish address. 
+
+     .. image:: img/appmanual_15.png
+        :scale: 40%  
+
+     .. image:: img/appmanual_16.png
+        :scale: 40%  
+
+     .. image:: img/appmanual_17.png
+        :scale: 40%  
+
+* **14**  you also can config the period  for the publish .
+
+     .. image:: img/appmanual_18.png
+        :scale: 40%  
+
+* **15**  press the  “APPLY “ button to let it take effect.. 
+
+     .. image:: img/appmanual_19.png
+        :scale: 40%          
 \-----------------------------------------------------------
