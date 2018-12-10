@@ -14,6 +14,7 @@ Welcome to Apollo SDK documentation!
    hardware_drivers 
    module/module
    hardware/pinshare
+   ble_profiles
    ble_demos
    ble_mesh
 	
