@@ -1,5 +1,5 @@
 ==============================================
-simple generic onoff server with relay demo
+simple generic onoff server  demo
 ==============================================
 
 
@@ -25,6 +25,16 @@ simple generic onoff server with relay demo
 _`示例功能简介`
 ==================
 
+本示例功能主要实现SIG 标准的 generic onoff server model，可以用于灯等设备模型。
+本示例实例化了两个element，每个element包括一个 onoff server model，初始化部分
+可以参考examples 目录下 mesh_app.c 文件里面的 mesh_app_init_user函数说明，开发者
+可以非常容易添加更多的model。每个model初始化需要开发者初始化相关的控制接口，在例子
+程序中user_onoff_0_evt_cb，user_onoff_1_evt_cb分别作为两个开发者接口，通过控制灯
+的亮灭来进行示例。系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数
+即可，参考user_config_server_evt_cb 函数的实现，并在初始化进行注册。
+另外，为了对系统进行控制，在element0 里面也初始化了SIG 的config server model以便
+进行入网等相关的系统控制操作。
+
 该示例主要体现的功能点如下：
 ********************************
 
@@ -39,7 +49,7 @@ _`示例功能简介`
 
 
 * 节点支持relay可控，可以手动打开或关闭relay，便于部署。
-
+  注意：需要打开example下控制该功能的宏
 
 * 节点支持proxy server beacon 可控，可以手动打开或关闭该beacon，便于部署。
 
