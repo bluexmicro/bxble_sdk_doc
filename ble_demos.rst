@@ -7,3 +7,4 @@ BLE  Demos
     ble_demo/ble_broadcaster_demo
     ble_demo/ble_observer_demo
     ble_demo/ble_central_demo
+	ble_demo/ble_bond_manage
