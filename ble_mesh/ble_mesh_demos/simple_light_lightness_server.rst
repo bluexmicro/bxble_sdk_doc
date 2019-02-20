@@ -1,5 +1,5 @@
 ==============================================
-simple generic level server demo
+simple light lightness server demo
 ==============================================
 
 
@@ -24,26 +24,28 @@ simple generic level server demo
 
 _`示例功能简介`
 ==================
-本示例功能主要实现SIG 标准的 generic level server model，可以用于灯等设备模型。
-本示例实例化了两个element，每个element包括一个 level server model，初始化部分
+本示例功能主要实现SIG 标准的 light lightness server model，可以用于灯等设备模型。
+本示例实例化了两个element，每个element包括一个 lightness server model，初始化部分
 可以参考examples 目录下 mesh_app.c 文件里面的 mesh_app_init_user函数说明，开发者
 可以非常容易添加更多的model。每个model初始化需要开发者初始化相关的控制接口，在例子
-程序中user_level_0_evt_cb，user_level_1_evt_cb分别作为两个开发者接口，通过控制灯
-的亮灭来进行示例。例子程序中的 generic_transition_server_0 和 generic_transition_server_1
-两个 model 是设置 default transtion time,当发送的 ;level 命令中不带有 transition time 和 delay时。
-系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数系统也会将关键事件通知到开发者，
-开发者完成自己的关键事件处理函数系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数
-系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数即可，参考user_config_server_evt_cb 
-函数的实现，并在初始化进行注册。另外，为了对系统进行控制，在element0 里面也初始化了SIG 
-的config server model以便进行入网等相关的系统控制操作。
+程序中user_lightness_0_evt_cb，user_lightness_1_evt_cb分别作为两个开发者接口，通过控制灯
+的亮灭来进行示例。例子程序中的 light_transition_server_0 和 light_transition_server_1
+两个 model 是设置 default transtion time,当发送的 lightness 命令中不带有 transition time 和 delay时。
+lightness server 绑定了 level server 和 onoff server, 如果发送 level 和 onoff 的命令也会改变该灯 
+lightness 的值系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数系统也会将关键事件通知
+到开发者，开发者完成自己的关键事件处理函数系统也会将关键事件通知到开发者，开发者完成自己的关键事件
+处理函数系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数即可，参考user_config_server_evt_cb
+函数的实现，并在初始化进行注册。另外，为了对系统进行控制，在element0 里面也初始化了SIG 的 
+config server model以便进行入网等相关的系统控制操作。
 该示例主要体现的功能点如下：
+
 ********************************
 
 
 * 设备支持mesh proxy，可以通过手机，经gatt连接快速配置入网。
 
 
-* 节点上有两个generic level server，可以通过手机单独控制任一 server。
+* 节点上有两个light lightness server，可以通过手机单独控制任一 server。
 
 
 * 节点支持分组，可以分组控制。
@@ -81,9 +83,9 @@ ________________________________________________________________________________
                 * 常亮， 设备proxy server beacon 功能关闭；
        * 蓝灯
                 * 熄灭:
-                    * generic level server **1** 设置亮度的 level 值设置为0x8000；
+                    * light lightness server **1** 设置亮度的 lightness 值设置为 0；
                 * 不同亮度:
-                    * generic level server **1** 设置亮度的 level 的值不同；
+                    * light lightness server **1** 设置亮度的 lightness 为 0 的不同亮度；
        * 红灯
                 * 熄灭， 保留；
                 * 常亮， 保留；
@@ -96,13 +98,13 @@ ________________________________________________________________________________
                 * 常亮， relay 功能打开；
        * 红灯
                 * 熄灭:
-                    *generic level server **2** 设置亮度的 level 值设置为0x8000；
+                    *light lightness server **2** 设置亮度的 lightness 值设置为0；
                 * 不同亮度:
-                    *generic level server **2** 设置亮度的 level 的值不同；
+                    *light lightness server **2** 设置亮度的 lightness 为 0 的不同亮度；
 
 软件环境
 ********************************
-* 设备端运行 ble mesh sdk 的 examples 目录下 simple_generic_level_server示例。
+* 设备端运行 ble mesh sdk 的 examples 目录下 simple_light_lightness_server示例。
 * 手机端运行 任意厂商符合mesh标准的app。
 
 软件运行流程
@@ -123,7 +125,7 @@ ________________________________________________________________________________
     void mesh_user_main_init(void)
     {
         ///user data init
-        simple_generic_level_server_init();
+        simple_light_lightness_server_init();
 
         LOG(LOG_LVL_INFO,"mesh_user_main_init\n");
     }
@@ -135,7 +137,7 @@ ________________________________________________________________________________
        * 绿灯
                 * 熄灭， 设备proxy server beacon 功能默认打开；
        * 蓝灯
-                * 常亮， generic level server **1** 默认设置打开亮度 level 为 50%,此时 level 的值为0；
+                * 常亮， light lightness server **1** 默认设置打开亮度 lightness 为 50%,此时 lightness 的值为0x8000；
        * 红灯
                 * 熄灭， 保留；
   * led2 :
@@ -144,7 +146,7 @@ ________________________________________________________________________________
        * 蓝灯
                 * 熄灭， relay 功能默认关闭；
        * 红灯
-                * 常亮， generic level server **2** 默认设置打开亮度 level 为 50%,此时 level 的值为0；
+                * 常亮， light lightness server **2** 默认设置打开亮度 lightness 为 50%,此时 lightness 的值为0x8000；
 
 
 
