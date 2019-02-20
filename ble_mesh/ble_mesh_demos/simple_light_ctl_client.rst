@@ -1,5 +1,5 @@
 ==============================================
-simple generic onoff client demo
+simple light ctl client demo
 ==============================================
 
 
@@ -32,10 +32,10 @@ _`示例功能简介`
 * 设备支持mesh proxy，可以通过手机，经gatt连接快速配置入网。
 
 
-* 节点上有两个generic onoff clent，可以通过手机单独配置client的pub/sub。
+* 节点上有两个light ctl clent，可以通过手机单独配置client的pub/sub。
 
 
-* 可以跟onoff server 配合，设置 client 的 publication 功能来控制server 的灯开关。
+* 可以跟ctl server 配合，设置 client 的 publication 功能来控制server 的灯开关。
 
 
 * 节点支持relay可控，可以手动打开或关闭relay，便于部署。
@@ -89,7 +89,7 @@ ________________________________________________________________________________
 
 软件环境
 ********************************
-* 设备端运行 ble mesh sdk 的 examples 目录下 simple_generic_onoff_client示例。
+* 设备端运行 ble mesh sdk 的 examples 目录下 simple_light_ctl_client示例。
 * 手机端运行 任意厂商符合mesh标准的app。
 
 软件运行流程
@@ -112,7 +112,7 @@ ________________________________________________________________________________
     void mesh_user_main_init(void)
     {
         ///user data init
-        simple_generic_onoff_client_init();
+        simple_light_ctl_client_init();
 
         LOG(LOG_LVL_INFO,"mesh_user_main_init\n");
     }
