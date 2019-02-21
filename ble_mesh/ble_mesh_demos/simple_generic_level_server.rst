@@ -24,18 +24,17 @@ simple generic level server demo
 
 _`示例功能简介`
 ==================
-本示例功能主要实现SIG 标准的 generic level server model，可以用于灯等设备模型。
-本示例实例化了两个element，每个element包括一个 level server model，初始化部分
+本示例功能主要实现 SIG 标准的 generic level server model，可以用于灯等设备模型。
+本示例实例化了两个 element，每个 element 包括一个 level server model，初始化部分
 可以参考examples 目录下 mesh_app.c 文件里面的 mesh_app_init_user函数说明，开发者
 可以非常容易添加更多的model。每个model初始化需要开发者初始化相关的控制接口，在例子
 程序中user_level_0_evt_cb，user_level_1_evt_cb分别作为两个开发者接口，通过控制灯
 的亮灭来进行示例。例子程序中的 generic_transition_server_0 和 generic_transition_server_1
 两个 model 是设置 default transtion time,当发送的 ;level 命令中不带有 transition time 和 delay时。
-系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数系统也会将关键事件通知到开发者，
-开发者完成自己的关键事件处理函数系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数
 系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数即可，参考user_config_server_evt_cb 
-函数的实现，并在初始化进行注册。另外，为了对系统进行控制，在element0 里面也初始化了SIG 
-的config server model以便进行入网等相关的系统控制操作。
+函数的实现，并在初始化进行注册。另外，为了对系统进行控制，在element0 里面也初始化了SIG 的
+config server model以便进行入网等相关的系统控制操作。
+
 该示例主要体现的功能点如下：
 ********************************
 

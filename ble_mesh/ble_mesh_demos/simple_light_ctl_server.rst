@@ -32,12 +32,9 @@ _`示例功能简介`
 的亮灭来进行示例。例子程序中的 generic_transition_server_0 和 generic_transition_server_1
 两个 model 是设置 default transtion time,当发送的 ctl 命令中不带有 transition time 和 delay时。
 ctl server 绑定了 lightness server, level server 和 onoff server, 如果发送lightness, level 和
-onoff 的命令也会改变该灯的亮度，系统也会将关键事件通知到开发者，开发者完成自己的关键
-事件处理函数系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数系统也会将关键
-事件通知到开发者，开发者完成自己的关键事件处理函数系统也会将关键事件通知到开发者，开发者
-完成自己的关键事件处理函数即可，参考user_config_server_evt_cb 函数的实现，并在初始化进行
-注册。另外，为了对系统进行控制，在element0 里面也初始化了SIG 的 config server model以便
-进行入网等相关的系统控制操作。
+onoff 的命令也会改变该灯的亮度，系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理
+函数即可，参考user_config_server_evt_cb 函数的实现，并在初始化进行注册。另外，为了对系统进行
+控制，在element0 里面也初始化了SIG 的 config server model以便进行入网等相关的系统控制操作。
 
 该示例主要体现的功能点如下：
 
