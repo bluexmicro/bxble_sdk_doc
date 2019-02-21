@@ -1,5 +1,5 @@
 ==============================================
-simple light lightness server demo
+simple light hsl client demo
 ==============================================
 
 
@@ -7,49 +7,35 @@ simple light lightness server demo
 ==============================================
 * 示例功能简介
 
-    * 参考:     `示例功能简介`_
+    * 参考:  `示例功能简介`_
 
-* 如何运行示例代码
+* 如何运行示例代码  
 
-    * 参考:     `示例运行概要`_
+    * 参考:  `示例运行概要`_
 
-* 如何设置 ble mesh 角色
+* 如何设置 ble mesh 角色  
 
-    * 参考:     `ble mesh 角色设置`_
+    * 参考:  `ble mesh 角色设置`_
 
-* 如何处理 ble mesh 协议栈和应用协议栈的信息交互
+* 如何处理 ble mesh 协议栈和应用协议栈的信息交互  
 
-    * 参考:     `ble mesh 协议栈和应用协议栈的信息交互`_
+    * 参考:  `ble mesh 协议栈和应用协议栈的信息交互`_
 
 
 _`示例功能简介`
 ==================
-本示例功能主要实现SIG 标准的 light lightness server model，可以用于灯等设备模型。
-本示例实例化了两个element，每个element包括一个 lightness server model，初始化部分
-可以参考examples 目录下 mesh_app.c 文件里面的 mesh_app_init_user函数说明，开发者
-可以非常容易添加更多的model。每个model初始化需要开发者初始化相关的控制接口，在例子
-程序中user_lightness_0_evt_cb，user_lightness_1_evt_cb分别作为两个开发者接口，通过控制灯
-的亮灭来进行示例。例子程序中的 light_transition_server_0 和 light_transition_server_1
-两个 model 是设置 default transtion time,当发送的 lightness 命令中不带有 transition time 和 delay时。
-lightness server 绑定了 level server 和 onoff server, 如果发送 level 和 onoff 的命令也会改变该灯 
-lightness 的值系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数系统也会将关键事件通知
-到开发者，开发者完成自己的关键事件处理函数系统也会将关键事件通知到开发者，开发者完成自己的关键事件
-处理函数系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数即可，参考user_config_server_evt_cb
-函数的实现，并在初始化进行注册。另外，为了对系统进行控制，在element0 里面也初始化了SIG 的 
-config server model以便进行入网等相关的系统控制操作。
 
 该示例主要体现的功能点如下：
-
 ********************************
 
 
 * 设备支持mesh proxy，可以通过手机，经gatt连接快速配置入网。
 
 
-* 节点上有两个light lightness server，可以通过手机单独控制任一 server。
+* 节点上有两个light hsl clent，可以通过手机单独配置client的pub/sub。
 
 
-* 节点支持分组，可以分组控制。
+* 可以跟 hsl server 配合，设置 client 的 publication 功能来控制server 的灯开关。
 
 
 * 节点支持relay可控，可以手动打开或关闭relay，便于部署。
@@ -68,44 +54,42 @@ ________________________________________________________________________________
 
 * 按键
 
-  botton 3  button 4 同时按下 ，心跳灯会快闪，直到绿灯闪一下，，设备重启并重新初始化，该操作会丢弃所有之前配置，设备变成unprovision 状态
-
-* PIN
+  botton 3  button 4 同时按下 ，心跳灯会快闪，设备重启并重新初始化，该操作会丢弃所有之前配置，设备变成unprovision 状态
+  
+* PIN 
 
   PIN 7 8  短路 ：  relay 功能打开，LED2 蓝灯亮
   
   PIN 10 11短路 ：  延迟一分钟后 关闭proxy server beacon 功能打开，LED1红灯亮
-
+  
+  
+  
 * 指示灯
 
-  * led1 :
-       * 绿灯
+  * led1 : 
+     * 绿灯   
                 * 熄灭， 设备proxy server beacon 功能打开；
                 * 常亮， 设备proxy server beacon 功能关闭；
-       * 蓝灯
-                * 熄灭:
-                    * light lightness server **1** 设置亮度的 lightness 值设置为 0；
-                * 不同亮度:
-                    * light lightness server **1** 设置亮度的 lightness 为 0 的不同亮度；
-       * 红灯
+     * 蓝灯   
                 * 熄灭， 保留；
                 * 常亮， 保留；
-  * led2 :
-       * 绿灯
+     * 红灯  
+                * 熄灭， 保留；
+                * 常亮， 保留；
+  * led2 : 
+     * 绿灯   
                 * 闪烁， 设备正常工作；
                 * 常亮/长灭， 设备异常；
-       * 蓝灯
+     * 蓝灯   
                 * 熄灭， relay 功能关闭；
                 * 常亮， relay 功能打开；
-       * 红灯
-                * 熄灭:
-                    *light lightness server **2** 设置亮度的 lightness 值设置为0；
-                * 不同亮度:
-                    *light lightness server **2** 设置亮度的 lightness 为 0 的不同亮度；
+     * 红灯  
+                * 熄灭， 保留；
+                * 常亮， 保留；
 
 软件环境
 ********************************
-* 设备端运行 ble mesh sdk 的 examples 目录下 simple_light_lightness_server示例。
+* 设备端运行 ble mesh sdk 的 examples 目录下 simple_light_hsl_client示例。
 * 手机端运行 任意厂商符合mesh标准的app。
 
 软件运行流程
@@ -114,7 +98,9 @@ ________________________________________________________________________________
 **1. 用户自己函数入口**
 
    在 mesh_user_main.c 中， mesh_user_main_init()初始化自己数据。（需要注意：不能阻塞）
-
+   
+   注意实现client端的定时pub 函数 ，该函数原型可以参考 mesh_app_client_period_control函数
+   
 **2. 开启mesh协议栈调度**
 
    在用户函数执行完后，系统自动开启ble协议栈调度。
@@ -126,28 +112,37 @@ ________________________________________________________________________________
     void mesh_user_main_init(void)
     {
         ///user data init
-        simple_light_lightness_server_init();
+        simple_light_hsl_client_init();
 
         LOG(LOG_LVL_INFO,"mesh_user_main_init\n");
     }
+    
+.. code:: c
+    /** Init common server/client model*/
+    //init a client model
+   #define INIT_CLIENT_MODEL(model_name , model_id , sig_model)                     \
+        mesh_model_init(&model_name.model.base, model_id, sig_model,                        \
+                APPKEY_BOUND_NETKEY_MAX_NUM,model_name##_bound_key_buf);                    \
+        model_publish_subscribe_bind(&model_name.model.base , &model_name##_publish_state,  \
+                model_name##_subscription_list, ARRAY_LEN(model_name##_subscription_list),mesh_app_client_period_control); 
 
 例程初始状态
 ********************************
-设备正常上电后：
-  * led1 :
-       * 绿灯
+设备正常上电后： 
+  * led1 : 
+     * 绿灯   
                 * 熄灭， 设备proxy server beacon 功能默认打开；
-       * 蓝灯
-                * 常亮， light lightness server **1** 默认设置打开亮度 lightness 为 50%,此时 lightness 的值为0x8000；
-       * 红灯
+     * 蓝灯   
                 * 熄灭， 保留；
-  * led2 :
-       * 绿灯
+     * 红灯  
+                * 熄灭， 保留；
+  * led2 : 
+     * 绿灯   
                 * 闪烁， 设备正常工作；
-       * 蓝灯
+     * 蓝灯   
                 * 熄灭， relay 功能默认关闭；
-       * 红灯
-                * 常亮， light lightness server **2** 默认设置打开亮度 lightness 为 50%,此时 lightness 的值为0x8000；
+     * 红灯  
+                * 熄灭， 保留；
 
 
 
@@ -214,7 +209,7 @@ _`ble mesh 角色设置`
 
     provision_init(MESH_ROLE_UNPROV_DEVICE,mesh_unprov_evt_cb);
 
-
+    
 **3. 初始化角色相关的数据**
 
 .. code:: c
@@ -340,5 +335,5 @@ _`ble mesh 协议栈和应用协议栈的信息交互`
         UNPROV_ACTION_AUTH_INPUT_NUMBER_DONE,//input random number done
     } mesh_prov_action_type_t;
 
-    void provision_action_send (mesh_prov_action_type_t type , mesh_prov_evt_param_t param);
+void provision_action_send (mesh_prov_action_type_t type , mesh_prov_evt_param_t param);
 

@@ -1,5 +1,5 @@
 ==============================================
-simple light lightness server demo
+simple light hsl server demo
 ==============================================
 
 
@@ -24,19 +24,20 @@ simple light lightness server demo
 
 _`示例功能简介`
 ==================
-本示例功能主要实现SIG 标准的 light lightness server model，可以用于灯等设备模型。
-本示例实例化了两个element，每个element包括一个 lightness server model，初始化部分
+本示例功能主要实现SIG 标准的 light hsl server model，可以用于灯等设备模型。
+本示例实例化了两个element，每个element包括一个 hsl server model，初始化部分
 可以参考examples 目录下 mesh_app.c 文件里面的 mesh_app_init_user函数说明，开发者
 可以非常容易添加更多的model。每个model初始化需要开发者初始化相关的控制接口，在例子
-程序中user_lightness_0_evt_cb，user_lightness_1_evt_cb分别作为两个开发者接口，通过控制灯
-的亮灭来进行示例。例子程序中的 light_transition_server_0 和 light_transition_server_1
-两个 model 是设置 default transtion time,当发送的 lightness 命令中不带有 transition time 和 delay时。
-lightness server 绑定了 level server 和 onoff server, 如果发送 level 和 onoff 的命令也会改变该灯 
-lightness 的值系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数系统也会将关键事件通知
-到开发者，开发者完成自己的关键事件处理函数系统也会将关键事件通知到开发者，开发者完成自己的关键事件
-处理函数系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数即可，参考user_config_server_evt_cb
-函数的实现，并在初始化进行注册。另外，为了对系统进行控制，在element0 里面也初始化了SIG 的 
-config server model以便进行入网等相关的系统控制操作。
+程序中user_hsl_0_evt_cb，user_hsl_1_evt_cb分别作为两个开发者接口，通过控制灯
+的亮灭来进行示例。例子程序中的 generic_transition_server_0 和 generic_transition_server_1
+两个 model 是设置 default transtion time,当发送的 hsl 命令中不带有 transition time 和 delay时。
+hsl server 绑定了 lightness server, level server 和 onoff server, 如果发送lightness, level 和
+onoff 的命令也会改变该灯的亮度，系统也会将关键事件通知到开发者，开发者完成自己的关键
+事件处理函数系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数系统也会将关键
+事件通知到开发者，开发者完成自己的关键事件处理函数系统也会将关键事件通知到开发者，开发者
+完成自己的关键事件处理函数即可，参考user_config_server_evt_cb 函数的实现，并在初始化进行
+注册。另外，为了对系统进行控制，在element0 里面也初始化了SIG 的 config server model以便
+进行入网等相关的系统控制操作。
 
 该示例主要体现的功能点如下：
 
@@ -46,7 +47,7 @@ config server model以便进行入网等相关的系统控制操作。
 * 设备支持mesh proxy，可以通过手机，经gatt连接快速配置入网。
 
 
-* 节点上有两个light lightness server，可以通过手机单独控制任一 server。
+* 节点上有两个light hsl server，可以通过手机单独控制任一 server。
 
 
 * 节点支持分组，可以分组控制。
@@ -68,44 +69,35 @@ ________________________________________________________________________________
 
 * 按键
 
-  botton 3  button 4 同时按下 ，心跳灯会快闪，直到绿灯闪一下，，设备重启并重新初始化，该操作会丢弃所有之前配置，设备变成unprovision 状态
+  botton 3  button 4 同时按下 ，直到绿灯闪一下，设备重启并重新初始化，该操作会丢弃所有之前配置，设备变成unprovision 状态
 
 * PIN
-
-  PIN 7 8  短路 ：  relay 功能打开，LED2 蓝灯亮
   
   PIN 10 11短路 ：  延迟一分钟后 关闭proxy server beacon 功能打开，LED1红灯亮
 
 * 指示灯
 
   * led1 :
-       * 绿灯
-                * 熄灭， 设备proxy server beacon 功能打开；
-                * 常亮， 设备proxy server beacon 功能关闭；
-       * 蓝灯
-                * 熄灭:
-                    * light lightness server **1** 设置亮度的 lightness 值设置为 0；
-                * 不同亮度:
-                    * light lightness server **1** 设置亮度的 lightness 为 0 的不同亮度；
-       * 红灯
-                * 熄灭， 保留；
-                * 常亮， 保留；
+       * 熄灭：
+            light hsl server **1** 设置的 lightness 值为 0；
+       * 不同亮度和颜色
+            light hsl server **1** 设置的 lightness 的值为不为 0 的值，并且和 hue于 saturation 的值转换成
+            RGB 值然后显示成不同的颜色。
   * led2 :
        * 绿灯
-                * 闪烁， 设备正常工作；
-                * 常亮/长灭， 设备异常；
+                * 熄灭， 保留；
        * 蓝灯
-                * 熄灭， relay 功能关闭；
-                * 常亮， relay 功能打开；
+                * 熄灭， 保留；
        * 红灯
                 * 熄灭:
-                    *light lightness server **2** 设置亮度的 lightness 值设置为0；
+                    *light hsl server **2** 设置亮度的 lightness 值设置为0；
                 * 不同亮度:
-                    *light lightness server **2** 设置亮度的 lightness 为 0 的不同亮度；
+                    *light hsl server **2** 设置亮度的 lightness 为 0 的不同亮度,
+                        并且还与 hue 和 saturation 有关。
 
 软件环境
 ********************************
-* 设备端运行 ble mesh sdk 的 examples 目录下 simple_light_lightness_server示例。
+* 设备端运行 ble mesh sdk 的 examples 目录下 simple_light_hsl_server示例。
 * 手机端运行 任意厂商符合mesh标准的app。
 
 软件运行流程
@@ -126,7 +118,7 @@ ________________________________________________________________________________
     void mesh_user_main_init(void)
     {
         ///user data init
-        simple_light_lightness_server_init();
+        simple_light_hsl_server_init();
 
         LOG(LOG_LVL_INFO,"mesh_user_main_init\n");
     }
@@ -135,19 +127,14 @@ ________________________________________________________________________________
 ********************************
 设备正常上电后：
   * led1 :
-       * 绿灯
-                * 熄灭， 设备proxy server beacon 功能默认打开；
-       * 蓝灯
-                * 常亮， light lightness server **1** 默认设置打开亮度 lightness 为 50%,此时 lightness 的值为0x8000；
-       * 红灯
-                * 熄灭， 保留；
+       * 常亮, 默认为白色的光，此时亮度为 50%， lightness 的值为 0x8000, hue 的值为0 ，saturation 的值为0；
   * led2 :
        * 绿灯
-                * 闪烁， 设备正常工作；
+                * 熄灭， 保留；
        * 蓝灯
                 * 熄灭， relay 功能默认关闭；
        * 红灯
-                * 常亮， light lightness server **2** 默认设置打开亮度 lightness 为 50%,此时 lightness 的值为0x8000；
+                * 常亮， light hsl server **2** 默认设置打开亮度 lightness 为 50%,此时 lightness 的值为0x8000；
 
 
 
