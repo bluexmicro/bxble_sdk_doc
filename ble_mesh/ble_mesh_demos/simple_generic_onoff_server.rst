@@ -25,7 +25,7 @@ simple generic onoff server  demo
 _`示例功能简介`
 ==================
 
-本示例功能主要实现SIG 标准的 generic onoff server model，可以用于灯等设备模型。
+本示例功能主要实现SIG 标准的 generic onoff server model，可以用于灯等设备模型。 
 本示例实例化了两个element，每个element包括一个 onoff server model，初始化部分
 可以参考examples 目录下 mesh_app.c 文件里面的 mesh_app_init_user函数说明，开发者
 可以非常容易添加更多的model。每个model初始化需要开发者初始化相关的控制接口，在例子
