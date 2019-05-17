@@ -284,7 +284,7 @@ _`ble mesh 协议栈和应用协议栈的信息交互`
 实现消息交互的处理函数
 ********************************
 
-  相关的API函数，可以参考	\app\freertos\mesh\provision\api\provision_api.c
+  **相关的API函数，可以参考\app\freertos\mesh\provision\api\provision_api.c
 
 
 
