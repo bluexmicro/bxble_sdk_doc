@@ -19,3 +19,4 @@ BLE Mesh Demos
     ble_mesh_demos/simple_time_scheduler_server.rst
     ble_mesh_demos/simple_custom_vendor_server.rst
     ble_mesh_demos/simple_custom_vendor_client.rst
+    ble_mesh_demos/simple_tmjl_hsl_ctl.rst
