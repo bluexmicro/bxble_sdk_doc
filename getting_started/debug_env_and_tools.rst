@@ -91,7 +91,7 @@ Apollo使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出
 
 #. Segger RTT/Log输出
 
-   RTT是Segger在借鉴了SWO和SemiHost的基础上，提供的一种嵌入式交互技术。根据Segger的介绍，RTT可以在不影响CPU运行的前提下，实现微处理器的输入输出。在Apollo里，只使用了信息输出这一种功能。
+   RTT是Segger在借鉴了SWO和SemiHost的基础上，提供的一种嵌入式交互技术。根据Segger的介绍，RTT可以在不影响CPU运行的前提下，实现微处理器的输入输出。在Apollo里，默认只使用了信息输出这一种功能。
 
    .. image:: debug_env_and_tools_img9.png
 
@@ -117,21 +117,63 @@ Apollo使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出
 
       .. image:: debug_env_and_tools_img10.png
 
-      后面的十六进制数字为_segger_rtt结构链接后的地址，复制这个地址，接下来会使用到。
+      后面的十六进制数字为_segger_rtt结构链接后的地址。将这个地址复制，然后将编译链接后的工程调试起来。
 
    #) 在RTT控制面板配置
 
-      连接好SWD接口，给板子烧录程序后复位或者重新上电。      打开J-Link RTT Viewer.exe软件，按如下图配置，将之前map里找到的_segger_rtt十六进制地址填入最下面的Address框中：
+      当使用JLink下载可执行文件到目标板并调试起来之后，会在PC端启动一个进程，显示在桌面右下角：
 
+      .. image:: debug_env_and_tools_img11.png
+
+      双击打开后，选择RTT选项配置面板，将之前map里找到的_segger_rtt十六进制地址填入RTT Address内，然后点击Start：
+
+      .. image:: debug_env_and_tools_img12.png
+
+      当RTT成功定位到RAM里的RTT存储区域时，会显示Located RTT control block @ 0xXXXXXXXX，否则定位失效，需要查找具体原因。
+
+      注意：在准备打印RTT的同时，有时会出现RTT locked buy other JLink这种提示，原因是PC端又开了类似于JFlash的JLink软件，JLink Control Panel会有多个实例。这时只需要在桌面右下角找到其他Control Panel实例，填入RTT地址即可。
+
+   #) 另一种查看RTT log的方法
+
+      打开J-Link RTT Viewer.exe软件，按如下图配置，将之前map里找到的_segger_rtt十六进制地址填入最下面的Address框中：
+      
       .. image:: debug_env_and_tools_img13.png
 
       然后点击"OK"，若没其他问题，即可在窗口中看到log：
 
       .. image:: debug_env_and_tools_img14.png
 
-      注意：若PC端开了多个类似于JFlash的JLink软件，JLink Control Panel会有多个实例，可在桌面右下角看到。请关闭其他不用的JLink软件，只保留J-Link RTT Viewer.exe软件。
+#. Segger RTT 输入
 
-      .. image:: debug_env_and_tools_img11.png
+      RTT支持两个方向上的多个通道，向上到主机，向下到目标板，所以我们可以像串口那样往IC端发送信息以方便调试，所需步骤如下：
+
+   a) 修改J-Link RTT Viewer.exe的配置
+
+      在菜单栏上依次选择 “Input” -> "Sending..." -> "Send on Enter"，以及“Input” -> "End of Line..." 根据需要选择行结束符，不需要就选择None。
+
+      .. image:: debug_env_and_tools_img15.png
+      
+      .. image:: debug_env_and_tools_img16.png
+
+   #) 修改IC端RTT接收buf的大小
+
+      根据自己需要修改SEGGER_RTT_Conf.h文件下的“BUFFER_SIZE_DOWN”，该宏定义了RTT IC端接收PC上位机数据的buf大小，默认是16，这里该成101：
+      
+      .. image:: debug_env_and_tools_img17.png
+
+   #) 接收数据实现
+
+      定义一个数组buf，然后在程序中利用timer或其他方法，重复地调用SEGGER_RTT_Read(0,buf,sizeof(buf))函数去获取PC端发送到IC端RTT的接收buf里的数据，该函数返回值是获取到的字符长度，若长度为非零，便去解析数据，最终实现数据的接收处理。
+   
+      .. image:: debug_env_and_tools_img18.png
+
+   #) 使用J-Link RTT Viewer.exe发送数据
+
+      在RTT Viewer窗口的最下面输入框里输入要发送的内容，然后点击“Enter”：
+      
+      .. image:: debug_env_and_tools_img19.png
+
+      即可在窗口里看到返回的log，包括接收到的数据长度和具体内容。
 
 #. HardFault中断
 
