@@ -117,22 +117,22 @@ Apollo使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出
 
       .. image:: debug_env_and_tools_img10.png
 
-      后面的十六进制数字为_segger_rtt结构链接后的地址。将这个地址复制，然后将编译链接后的工程调试起来。
+      后面的十六进制数字为_segger_rtt结构链接后的地址，复制这个地址，接下来会使用到。
 
    #) 在RTT控制面板配置
 
-      当使用JLink下载可执行文件到目标板并调试起来之后，会在PC端启动一个进程，显示在桌面右下角：
+      连接好SWD接口，给板子烧录程序后复位或者重新上电。      打开J-Link RTT Viewer.exe软件，按如下图配置，将之前map里找到的_segger_rtt十六进制地址填入最下面的Address框中：
+
+      .. image:: debug_env_and_tools_img13.png
+
+      然后点击"OK"，若没其他问题，即可在窗口中看到log：
+
+      .. image:: debug_env_and_tools_img14.png
+
+      注意：若PC端开了多个类似于JFlash的JLink软件，JLink Control Panel会有多个实例，可在桌面右下角看到。请关闭其他不用的JLink软件，只保留J-Link RTT Viewer.exe软件。
 
       .. image:: debug_env_and_tools_img11.png
 
-      双击打开后，选择RTT选项配置面板，将之前map里找到的_segger_rtt十六进制地址填入RTT Address内，然后点击Start：
-
-      .. image:: debug_env_and_tools_img12.png
-
-      当RTT成功定位到RAM里的RTT存储区域时，会显示Located RTT control block @ 0xXXXXXXXX，否则定位失效，需要查找具体原因。
-
-      注意：在准备打印RTT的同时，有时会出现RTT locked buy other JLink这种提示，原因是PC端又开了类似于JFlash的JLink软件，JLink Control Panel会有多个实例。这时只需要在桌面右下角找到其他Control Panel实例，填入RTT地址即可。
-   
 #. HardFault中断
 
    HardFault是ARM 处理器中常见且有用的错误中断。当CPU遇到一些硬件异常，例如指令异常，总线出错，空指针等，HardFault中断会触发。在中断触发时，会将导致错误中断产生时的一些CPU寄存器压入当前栈中，同时将EXC_RETURN写入LR,以表明中断类型。关于EXC_RETURN的内容，可以参考ARM Cortex-M权威指南中的相关内容。
