@@ -4,6 +4,8 @@ Getting Started
 
 .. toctree::
 
+   getting_started/sdk_env_setup
+   getting_started/run_demo_app
    getting_started/tools_installation
    getting_started/running_precompile_examples
    getting_started/how_to_build_the_first_app
@@ -16,11 +18,4 @@ Getting Started
    getting_started/flash_programming_guide_using_jflash
    getting_started/application_config_guide
 
-Necessary software tools
-
-Hardware preparation
-
-Run precompiled examples
-
-Compile and run an example
 
