@@ -131,12 +131,12 @@ Apollo使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出
 
       当RTT成功定位到RAM里的RTT存储区域时，会显示Located RTT control block @ 0xXXXXXXXX，否则定位失效，需要查找具体原因。
 
-      注意：在准备打印RTT的同时，有时会出现RTT locked buy other JLink这种提示，原因是PC端又开了类似于JFlash的JLink软件，JLink Control Panel会有多个实例。这时只需要在桌面右下角找到其他Control Panel实例，填入RTT地址即可。
+      注意：在准备打印RTT的同时，有时会出现RTT locked by other JLink这种提示，原因是PC端又开了类似于JFlash的JLink软件，JLink Control Panel会有多个实例。这时只需要在桌面右下角找到其他Control Panel实例，填入RTT地址即可。
 
    #) 另一种查看RTT log的方法
 
       打开J-Link RTT Viewer.exe软件，按如下图配置，将之前map里找到的_segger_rtt十六进制地址填入最下面的Address框中：
-      
+
       .. image:: debug_env_and_tools_img13.png
 
       然后点击"OK"，若没其他问题，即可在窗口中看到log：
@@ -152,25 +152,25 @@ Apollo使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出
       在菜单栏上依次选择 “Input” -> "Sending..." -> "Send on Enter"，以及“Input” -> "End of Line..." 根据需要选择行结束符，不需要就选择None。
 
       .. image:: debug_env_and_tools_img15.png
-      
+
       .. image:: debug_env_and_tools_img16.png
 
    #) 修改IC端RTT接收buf的大小
 
       根据自己需要修改SEGGER_RTT_Conf.h文件下的“BUFFER_SIZE_DOWN”，该宏定义了RTT IC端接收PC上位机数据的buf大小，默认是16，这里该成101：
-      
+
       .. image:: debug_env_and_tools_img17.png
 
    #) 接收数据实现
 
       定义一个数组buf，然后在程序中利用timer或其他方法，重复地调用SEGGER_RTT_Read(0,buf,sizeof(buf))函数去获取PC端发送到IC端RTT的接收buf里的数据，该函数返回值是获取到的字符长度，若长度为非零，便去解析数据，最终实现数据的接收处理。
-   
+
       .. image:: debug_env_and_tools_img18.png
 
    #) 使用J-Link RTT Viewer.exe发送数据
 
       在RTT Viewer窗口的最下面输入框里输入要发送的内容，然后点击“Enter”：
-      
+
       .. image:: debug_env_and_tools_img19.png
 
       即可在窗口里看到返回的log，包括接收到的数据长度和具体内容。

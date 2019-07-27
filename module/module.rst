@@ -5,3 +5,4 @@ Module
     nvds
     ram_log
     bx_log
+    ota
