@@ -13,6 +13,7 @@ Common steps of building and running a program
 #. Download the hex file with bootloader to flash.
 #. Reset the board, then the program will run.
 
+.. _flash_parameters_configuration:
 
 Flash parameters configuration for bootloader
 -----------------------------------------------
@@ -44,7 +45,7 @@ The file looks like:
     quad_bit_offset = 9
     status_length = 2
     
-Fisrt of all, set *Flash:total_size* to the actucal value and *App:ota_base* and *App:data_base* to appropriate value. Refer to :doc:`flash_usage_image_structure` for detailed description of *App:ota_base* and *App:data_base*.
+Fisrt of all, set *Flash:total_size* to the actucal value and *App:ota_base* and *App:data_base* to appropriate value. Refer to :doc:`memory_map_image_structure` for detailed description of *App:ota_base* and *App:data_base*.
 
 Then configure [Multi_Read] [Quad_Enable_Read] [Quad_Enable_Write] according to Flash datasheet.
 
