@@ -60,8 +60,33 @@ dual_quad        1         2        1        2
 
 [Quad_Enable_Read] [Quad_Enable_Write] configurations are only valid for Quad Flash.
 
-TODO:detailed description for Quad_Enable_Read and Quad_Enable_Write configuration
+Flash Quad Enable Config Guide
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+We'll use the datasheet of Quad Nor Flash Winbond W25Q80DV as an example to illustrate how to set [Quad_Enable_Read] and [Quad_Enable_Write].
 
+[Quad_Enable_Read]
+    This configuration is used to tell the bootloader the way to get Quad status of flash. The 9th bit (S9) of ststus register, non-volatile QE bit, indicating whether the flash allows Quad operation can be read by Read Status Register command.
+    
+    .. image:: flash_read_status_reg.png
+    
+    The QE bit is in status register 2. So we should use "cmd = 0x35".
+    
+    After issuing the cmd 0x35, only one byte of data on FLASH SO pin is necessary. So we should set "status_length = 1".
+    
+    In this one byte of data received, the offset of QE bit to LSB is 1. So we should set "quad_bit_offset = 1".
+    
+[Quad_Enable_Write]
+    This configuration is used to tell the bootloader the way to set Quad status of flash. The QE bit can be written by Write Status Register command.
+    
+    .. image:: flash_write_status_reg.png
+    
+    Write Status Register: "cmd = 0x01"
+    
+    There are two bytes following the command. So we should set "status_length = 2".
+    
+    Before issuing the command through SPI interface, we will prepare a two-bytes-long data in memory. The QE bit will the 9th bit of this two-bytes-long data. So we should set "quad_bit_offset = 9".
+    
+When system booting, the bootloader will first check whether the flash allows Quad operations now according to configuration [Quad_Enable_Read]. If the flash doesn't allows Quad operations now, it will set the QE bit according to configuration [Quad_Enable_Write]. Please note that, QE is 1 and all the other bits are 0 when issuing Write Status Register command.
 
 
 
