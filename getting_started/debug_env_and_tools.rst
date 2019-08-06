@@ -131,7 +131,7 @@ Apollo使用Keil作为调试环境，辅以Segger RTT的方式log输出，在出
 
       当RTT成功定位到RAM里的RTT存储区域时，会显示Located RTT control block @ 0xXXXXXXXX，否则定位失效，需要查找具体原因。
 
-      注意：在准备打印RTT的同时，有时会出现RTT locked buy other JLink这种提示，原因是PC端又开了类似于JFlash的JLink软件，JLink Control Panel会有多个实例。这时只需要在桌面右下角找到其他Control Panel实例，填入RTT地址即可。
+      注意：在准备打印RTT的同时，有时会出现RTT locked by other JLink这种提示，原因是PC端又开了类似于JFlash的JLink软件，JLink Control Panel会有多个实例。这时只需要在桌面右下角找到其他Control Panel实例，填入RTT地址即可。
 
    #) 另一种查看RTT log的方法
 
