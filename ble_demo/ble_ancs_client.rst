@@ -37,35 +37,8 @@ ble 添加 profile
 
 ble 协议栈和应用协议栈的信息交互
 ==================================
-  
-**1. 协议栈和profile的交互**
 
-.. code:: c
-
-    const struct ke_msg_handler ancc_default_state[] =
-    {
-        {GATTC_CMP_EVT,(ke_msg_func_t)gattc_cmp_evt_handler},
-        {GATTC_SDP_SVC_IND,(ke_msg_func_t)gattc_sdp_svc_ind_handler},
-        {ANCC_ENABLE_REQ,(ke_msg_func_t)ancc_enable_req_handler},
-        {ANCC_CL_CFG_NTF_EN_CMD,(ke_msg_func_t)ancc_cl_cfg_ntf_en_cmd_handler},
-        {GATTC_EVENT_IND,(ke_msg_func_t)gattc_event_ind_handler},
-        {ANCC_GET_NTF_ATTS_CMD,(ke_msg_func_t)ancc_get_ntf_atts_cmd_handler},
-        {ANCC_GET_APP_ATTS_CMD,(ke_msg_func_t)ancc_get_app_atts_cmd_handler},
-        {ANCC_PERFORM_NTF_ACTION_CMD,(ke_msg_func_t)ancc_perform_ntf_action_cmd_handler},
-    };
-
-    const struct ke_msg_handler gattsc_default_state[] =
-    {
-        {GATTC_CMP_EVT,(ke_msg_func_t)gattc_cmp_evt_handler},
-        {GATTC_SDP_SVC_IND,(ke_msg_func_t)gattc_sdp_svc_ind_handler},
-        {GATTSC_ENABLE_REQ,(ke_msg_func_t)gattsc_enable_req_handler},
-        {GATTSC_SVC_CHANGED_IND_CFG_CMD,(ke_msg_func_t)gattsc_svc_changed_ind_cfg_cmd_handler},
-        {GATTC_EVENT_REQ_IND,(ke_msg_func_t)gattc_event_req_ind_handler},
-    };
-
-
-
-**2. profile和应用的交互**
+**1. profile和应用的交互**
 
 .. code:: c
 
@@ -87,5 +60,12 @@ ble 协议栈和应用协议栈的信息交互
         {GATTSC_SVC_CHANGED_IND,(osapp_msg_handler_t)osapp_gattsc_svc_chaged_handler},
         {GATTSC_CMP_EVT,(osapp_msg_handler_t)osapp_gattsc_cmp_evt_handler},
     };
+
+
+profile和app的交互流程如下图所示：
+
+.. image:: img/ancc_profile_app.png
+
+.. image:: img/gattsc_profile_app.png
 
 profile是app和协议栈的中间层，有了profile，app和协议栈的交互容易得多，app只需要发送一条profile task add命令，profile就可以帮助app完成很多事，比如构建profile、处理来自对端设备的消息，然后再将处理的结果返回给app。对于ancs，app首先发送一条ANCC_ENABLE_REQ给profile，profile去发现苹果手机的ancs，然后将发现的ancs有关信息通信ANCC_ENABLE_RSP返回给应用层，应该层接着去使能src_data cccd和ntf_data cccd。就能够接收到来自苹果手机的消息推送。对于service changed char，app首先发送GATTSC_ENABLE_REQ到gattsc profile， gattsc profile去发现对端的gatt的service changed char,然后再去使能cccd，允许指示。当苹果手机上的服务发生变化时，会将发生变化的handle指示给与之绑定的设备
