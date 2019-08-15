@@ -86,7 +86,7 @@ We'll use the datasheet of Quad Nor Flash Winbond W25Q80DV as an example to illu
     
     Before issuing the command through SPI interface, we will prepare a two-bytes-long data in memory. The QE bit will the 9th bit of this two-bytes-long data. So we should set "quad_bit_offset = 9".
     
-When system booting, the bootloader will first check whether the flash allows Quad operations now according to configuration [Quad_Enable_Read]. If the flash doesn't allows Quad operations now, it will set the QE bit according to configuration [Quad_Enable_Write]. Please note that, QE is 1 and all the other bits are 0 when issuing Write Status Register command.
+When the system boots, the bootloader will first check whether the flash allows Quad operations now according to configuration [Quad_Enable_Read]. If the flash doesn't allows Quad operations now, it will set the QE bit according to configuration [Quad_Enable_Write]. Please note that, QE is 1 and all the other bits are 0 when issuing Write Status Register command.
 
 
 
