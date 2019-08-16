@@ -53,21 +53,169 @@ Make Directory
         BX_ASSERT(ret_val == BXFS_NO_ERROR || ret_val == BXFS_DIR_KEY_ALREADY_EXISTED);    
     }
 
-    
-Read Write Record
-~~~~~~~~~~~~~~~~~~
+After these operations, the tree looks like:
 
+::
+
+    ROOT_DIR
+    |-DIR_1_NAME
+    | |-DIR_11_NAME
+    | |-DIR_12_NAME
+    |-DIR_2_NAME
+      |-DIR_21_NAME
+      |-DIR_22_NAME
+
+    
+Write Record
+~~~~~~~~~~~~~~
+.. code :: c
+   
+    #define ROOT_RECORD_1 0x1
+    #define ROOT_RECORD_1_DATA "root_record_1_data"
+    #define DIR_1_RECORD_1 0x1
+    #define DIR_1_RECORD_1_DATA "dir_1_record_1_data"
+    #define DIR_2_RECORD_1 0x1
+    #define DIR_2_RECORD_1_DATA "dir_2_record_1_data"
+    #define DIR_11_RECORD_2 0x2
+    #define DIR_11_RECORD_2_DATA "dir_11_record_2_data"
+    
+    void records_write()
+    {
+        uint8_t ret_val = bxfs_write(ROOT_DIR,ROOT_RECORD_1,ROOT_RECORD_1_DATA,sizeof(ROOT_RECORD_1_DATA));
+        BX_ASSERT(ret_val == BXFS_NO_ERROR);
+        uint8_t ret_val = bxfs_write(dir_1,DIR_1_RECORD_1,DIR_1_RECORD_1_DATA,sizeof(DIR_1_RECORD_1_DATA));
+        BX_ASSERT(ret_val == BXFS_NO_ERROR);
+        uint8_t ret_val = bxfs_write(dir_2,DIR_2_RECORD_1,DIR_2_RECORD_1_DATA,sizeof(DIR_2_RECORD_1_DATA));
+        BX_ASSERT(ret_val == BXFS_NO_ERROR);
+        uint8_t ret_val = bxfs_write(dir_11,DIR_11_RECORD_2,DIR_11_RECORD_2_DATA,sizeof(DIR_11_RECORD_2_DATA));
+        BX_ASSERT(ret_val == BXFS_NO_ERROR);
+    }
+    
+After these operations, the tree looks like:
+
+::
+
+    ROOT_DIR
+    |-DIR_1_NAME
+    | |-DIR_11_NAME
+    | | |+DIR_11_RECORD_2
+    | |-DIR_12_NAME
+    | |+DIR_1_RECORD_1
+    |-DIR_2_NAME
+    | |-DIR_21_NAME
+    | |-DIR_22_NAME
+    | |+DIR_2_RECORD_1
+    |+ROOT_RECORD_1
+    
+Read Record
+~~~~~~~~~~~~
+.. code :: c
+
+    uint8_t dir_11_record_2[20];
+    void dir_11_record_2_read()
+    {
+        uint16_t length = 20;
+        uint8_t ret_val = bxfs_read(dir_11,DIR_11_RECORD_2,dir_11_record_2,&length);
+        BX_ASSERT(ret_val == BXFS_NO_ERROR && 
+            length == sizeof(DIR_11_RECORD_2_DATA) &&
+            memcmp(DIR_11_RECORD_2_DATA,dir_11_record_2,length) == 0 );
+    }
 
 Delete Record
 ~~~~~~~~~~~~~~
+.. code :: c
 
+    void root_record_1_del()
+    {
+        uint8_t ret_val = bxfs_del_record(ROOT_DIR,ROOT_RECORD_1);
+        BX_ASSERT(ret_val == BXFS_NO_ERROR);
+    }
+
+After these operations, the tree looks like:
+
+::
+
+    ROOT_DIR
+    |-DIR_1_NAME
+    | |-DIR_11_NAME
+    | | |+DIR_11_RECORD_2
+    | |-DIR_12_NAME
+    | |+DIR_1_RECORD_1
+    |-DIR_2_NAME
+      |-DIR_21_NAME
+      |-DIR_22_NAME
+      |+DIR_2_RECORD_1
 
 Delete Directory
 ~~~~~~~~~~~~~~~~~~
+.. code :: c
 
+    void dir_21_del()
+    {
+        bool force = false; // DIR_21 is empty, so 'force' is false
+        uint8_t ret_val = bxfs_del_dir(dir_21,force);
+        BX_ASSERT(ret_val == BXFS_NO_ERROR);
+    }
+    
+    void dir_2_del()
+    {
+        bool force = true; // DIR_2 is not empty,so 'force' is true
+        uint8_t ret_val = bxfs_del_dir(dir_2,force);
+        BX_ASSERT(ret_val == BXFS_NO_ERROR);
+    }
+
+After these operations, the tree looks like:
+
+::
+
+    ROOT_DIR
+    |-DIR_1_NAME
+      |-DIR_11_NAME
+      | |+DIR_11_RECORD_2
+      |-DIR_12_NAME
+      |+DIR_1_RECORD_1
+
+**Validate All Changes**
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code :: c
+
+    void validate_all_changes_at_once()
+    {
+        bxfs_write_through();
+    }    
+
+Once bxfs_write_through() has been called, all changes made just now are stored to Flash. All information can be restored correctly if there is a power failure afterwards.
 
 List All Records in A Directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code :: c
+
+    uint16_t dir_1_record_list[10];
+    void get_record_list_in_dir_1()
+    {
+        uint16_t num = 10;
+        uint8_t ret_val = bxfs_record_list_get(dir_1,&num,dir_1_record_list);
+        BX_ASSERT(ret_val == BXFS_NO_ERROR && num == 1 && dir_1_record_list[0] == DIR_1_RECORD_1);
+    }
+    
+Erase all data in BXFS
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. code :: c
+    
+    bxfs_erase_data();
+    
+All data stored in BXFS, such as BLE bonding information, Mesh network status and user customized data, will be erased physically. This is commonly used for restoring factory settings.
+
+Flash Storage Format
+---------------------
+
+
+
+Wear Levelling
+---------------
+    
+Data Integrity and Power Failure Resilience
+---------------------------------------------
 
 
 
