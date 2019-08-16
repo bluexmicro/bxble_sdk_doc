@@ -62,5 +62,5 @@ Ota_base
     When performing firmware OTA, the new image is temporarily placed at ota_base. The new image will be copied to original image base 0x803000 after authentication in the boot sequence.
 
 Data_base
-    Persistent data are stored in flash starting from data_base by bxfs. Such as security data of bonding in BLE application, network status data in MESH application.
-    See :doc:`bxfs_intro` for more about bxfs.
+    Persistent data are stored in flash starting from data_base by BXFS. Such as security data of bonding in BLE application, network status data in MESH application.
+    See :doc:`../module/bxfs` for how it manages persistent data.
