@@ -16,14 +16,14 @@ ble 自定义 service
 
 .. code:: c
 
-	static const struct gattm_svc_desc bx_simple_svc_desc = {
-			.start_hdl = 0,
-			.task_id = TASK_ID_AHI,
-			.perm = PERM(SVC_MI,DISABLE)|PERM(SVC_EKS,DISABLE)|\
-				PERM(SVC_AUTH,NO_AUTH)|PERM(SVC_UUID_LEN,UUID_128),PERM_VAL(SVC_SECONDARY,0),
-			.nb_att = BX_SIMPLES_ATT_NUM,
-			.uuid = BX_SIMPLE_SVC_UUID_128,
-	};
+    struct gattm_svc_desc const uart_svc_desc ={
+        .start_hdl = 0,
+        .task_id = TASK_ID_AHI,
+        .perm = PERM(SVC_MI,DISABLE)|PERM(SVC_EKS,DISABLE)|\
+            PERM(SVC_AUTH,NO_AUTH)|PERM(SVC_UUID_LEN,UUID_128),PERM_VAL(SVC_SECONDARY,0),
+        .nb_att = UART_SVC_ATT_NUM,
+        .uuid = UART_SVC_UUID_128,
+    };
 
 **2. 定义自己的att 属性列表**
 
