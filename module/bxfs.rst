@@ -17,7 +17,7 @@ In fact, writing log to Flash does not always invoke Flash programming. There is
 
 How to use BXFS
 ----------------
-During system initializing, *bxfs_init()* is called. Then all other BXFS APIs are avaiable.
+During system initializing, *bxfs_init()* is called. Then all other BXFS APIs are available.
 
 Make Directory
 ~~~~~~~~~~~~~~~~
@@ -242,9 +242,16 @@ The following picture shows BXFS storage with totally 4 sections and 5 logs acro
 
 Wear Levelling
 ---------------
-    
+
+Flash memory has a limited number of program-erase cycles(P/E cycles). In order to prolong the longevity of Flash, we should not erase some specific sectors frequently. Flash sectors used by BXFS are going to be erased with equal opportunity. New log information is programmed into Flash at the address that is the next byte following the previous log.
+
+Along with new log programming into Flash, the available space continuously decreases. At the same time, some old logs which have been removed or modified by subsequent logs become obsolete. When the available space reduces to a specific level, the operation of garbage collection is triggered. BXFS reserves some erasable units as buffering section for garbage collection. In the procedure of garbage collection, valid logs in the oldest section are copied to the available space, then the oldest section is erased, thus releasing the space occupied by obsolete logs. This procedure continues if the condition of garbage collection is met again and again.
+
+Based on this, all sections are programmed and erased equally. Any single section won't be worn down before all the others are nearly worn down.
+
 Data Integrity and Power Failure Resilience
 ---------------------------------------------
+BXFS ensures the data integrity. All parts of a log are authenticated by crc16 during BXFS initializtion and operation. Once bxfs_write_through() is called, all valid data can be recovered from a power loss. Because of the characteristic of BXFS that any page of Flash already programmed won't be modified, a power loss during Flash programming will only break the integrity of logs currently being programmed and won't lead to any damage to other logs already programmed. After reboot, BXFS will recognize these broken logs and correctly recover other data.
 
 
 

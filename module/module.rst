@@ -2,8 +2,8 @@ Module
 =================
 .. toctree::
 
-    nvds
     bxfs
-    ram_log
+    nvds
     bx_log
+    ram_log
     ota
