@@ -5,7 +5,18 @@ ble dis server
 功能简介
 ==========
 
-    dis server实现了设备信息服务和ota服务，server提供的设备信息服务包括了很多和设备相关的信息，比如厂商名字、串号、固件版本号等，对端设备可以访问这些信息，bxota service用于ota升级，需要配合安卓apk使用。
+    dis server实现了设备信息服务和ota服务，server提供的设备信息服务包括了很多和设备相关的信息，比如厂商名字、串号、固件版本号等，对端设备可以访问这些
+信息，bxota service用于ota升级，需要配合安卓apk使用。在添加diss profile和ota profile时，要注意在bx_app_config.h中定义相关宏，代码如下：
+
+.. code:: c
+
+    #ifndef BX_APP_CONFIG_H_
+    #define BX_APP_CONFIG_H_
+
+    #define CFG_PRF_DISS
+    #define CFG_PRF_BXOTAS
+
+    #endif
 
 ble 添加 service
 ======================
@@ -85,6 +96,18 @@ ble 协议栈和应用协议栈的信息交互
                     {BXOTAS_FINISH_IND,(osapp_msg_handler_t)osapp_bxotas_finish_ind_handler},
     };
 
+**3. 设备信息服务流程图**
 
+.. image:: img/dis_flow.png
+
+
+profile添加成功后，当client访问server上的设备信息服务时，server的profile会收到一条来自stack的GATTC_READ_REQ_IND，profile处理后发送DISS_VALUE_REQ_IND到app,app
+将请求的信息通到DISS_VALUE_CFM返回给profile,最后profile通过GATTC_READ_CFM返回给stack。
+
+**4. OTA流程图**
+
+.. image:: img/ota_flow.png
+
+ota需要配合安卓apk使用，apk作为client，app只会接收到两条消息BXOTAS_START_REQ_IND,这时需要回一条确认消息。当OTA完成之后，app会收到BXOTAS_FINISH_IND消息，然后app执行platform_reset.
 profile是app和协议栈的中间层，有了profile，app和协议栈的交互容易得多，app只需要发送一条profile task add命令，profile就可以帮助app完成很多事，比如构建profile、处理来自对端设备的消息，然后再将处理的结果返回给app。
 
