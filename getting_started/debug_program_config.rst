@@ -19,6 +19,8 @@ Keil Configuration
 
 .. image:: keil_configuration.png
 
+.. image:: keil_configuration_2.png
+
 Eclipse Configuration
 ----------------------
 #. Open Eclipse, import the project. Build a target. Click Run->Debug Configurations.

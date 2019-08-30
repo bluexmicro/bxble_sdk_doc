@@ -23,6 +23,11 @@ ble_q     Ble Task               App Task/Ble MAC Isr/HWECC Isr
 app_q     App Task               Ble Task(AHI)/Any Context(ASYNC_CALL)
 ======== =====================  ========================
 
-After the scheduler of FreeRTOS runs, Ble task initializes BLE software protocol stack and hardware, then it try to receive messages from ble_q in a infinite loop. Ble task will go into block state if no message in ble_q. When Ble task is blocked, App task with relatively lower priority will run, and then receives messages in a infinite loop as well from app_q.  
+After the scheduler of FreeRTOS runs, Ble task initializes BLE software protocol stack and hardware, then it try to receive messages from ble_q in a infinite loop. Ble task will go into block state if no message in ble_q. When Ble task is blocked, App task with relatively lower priority will run, call user_init() and then receive messages in a infinite loop as well from app_q.  
 
-After Ble task succeeds in initialization, a message indicating that BLE protocol stack is ready is generated and sent to app_q. So App task will handle this message once it starts to run. Typically, App task sends GAPM_RESET command to ble_q to continue the application flow. As a response, App task will receive GAPM_CMP_EVT(GAPM_RESET) message.
+After Ble task succeeds in initialization, a message indicating that BLE protocol stack is ready is generated and sent to app_q. So App task will handle this message once it starts to run. Typically, App task sends GAPM_RESET command to ble_q to continue the application flow. As a response, App task will receive GAPM_CMP_EVT(GAPM_RESET) message. 
+
+The following picture shows the typical message flow.
+
+.. image:: Typical_Message_Flow_Between_Ble_and_App_task.png
+
