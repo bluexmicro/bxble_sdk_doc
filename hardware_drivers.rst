@@ -2,7 +2,8 @@
 Hardware Drivers
 =================
 .. toctree::
-
+    :maxdepth: 1
+    
     peripheral/uart
     peripheral/spi
     peripheral/hwecc

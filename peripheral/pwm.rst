@@ -12,7 +12,8 @@ PWM控制器
 PWM控制器的主要特性如下表所示：
 
 - PWM控制器时钟源最高可达16MHz，时钟源频率可以进行配置。
-- 每个PWM通道相互独立，可以分别配置高低电平持续时间。
+- IO输出最高可达8MHz。（时钟源=16MHz , high_time=low_time=1）
+- 每个PWM通道相互独立，可以分别配置高低电平持续时间，但是公用时钟源。
 - 5路输出，每一路PWM对应的IO口可以进行配置。
 
 ***************
@@ -66,130 +67,91 @@ ALL_CHANNEL_PWM_CLK_DIV取值             分频
 
 .. code:: c
 
-    app_pwm_inst_t pwm0 = PWM_INSTANCE(0);
-    app_pwm_inst_t pwm1 = PWM_INSTANCE(1);
-    app_pwm_inst_t pwm2 = PWM_INSTANCE(2);
-    app_pwm_inst_t pwm3 = PWM_INSTANCE(3);
-    app_pwm_inst_t pwm4 = PWM_INSTANCE(4);
+    app_pwm_inst_t bxpwm = PWM_INSTANCE();
 
 
 如果使用PWM外设，必须首先声明PWM实例，然后才可以对实例进行操作。
 
-其中“PWM_INSTANCE”宏定义可以进行PWM实例的声明，其中的参数为PWM控制器序号，数值为0-4。
-
-如需同时使用多个PWM通道，则需要同时声明多个实例。上述代码声明了5个PWM实例，可以同时输出5路PWM信号。
+其中“PWM_INSTANCE”宏定义可以进行PWM实例的声明。只需声明一个实例即可，一个实例中包含了5个channel。
 
 
 
-第三步：设置PWM实例参数，并初始化
+
+第三步：设置PWM的IO口，并初始化
 ====================================
 
 
 .. code:: c
 
-    pwm0.param.pin_num   = 8;
-    pwm0.param.high_time = 100;
-    pwm0.param.low_time  = 100;
-    app_pwm_init(&pwm0.inst);
+    bxpwm.channel[PWM_CHANNEL_0].pin_num = 8;
+    bxpwm.channel[PWM_CHANNEL_1].pin_num = 9;
+    bxpwm.channel[PWM_CHANNEL_2].pin_num = 10;
+    bxpwm.channel[PWM_CHANNEL_3].pin_num = 11;
+    bxpwm.channel[PWM_CHANNEL_4].pin_num = 12;
+    app_pwm_init(&bxpwm.inst);
 
 
-PWM实例的参数在param成员中，共有3个参数，参数含义如下表所示：
+如果用不到5个channel，则可以不进行配置对应的pin_num。
 
-=============    ==================================================
-参数               含义
-=============    ==================================================
-pin_num            管脚序号
-high_time          高电平持续时间，以分频之后的频率来计数。
-low_time           低电平持续时间，以分频之后的频率来计数。
-=============    ==================================================
-
-设置完毕参数之后，采用app_pwm_init函数来进行初始化。
+IO设置完毕之后，采用app_pwm_init函数来进行初始化。
 
 
 第四步：开启或关闭输出：
 ==============================
 
+方式一：配置高低电平
+----------------------------
 
 .. code:: c
 
-    app_pwm_start(&pwm0.inst);
-    app_pwm_stop (&pwm0.inst);
+    //#define ALL_CHANNEL_PWM_CLK_DIV     1
+    app_pwm_set_time(&bxpwm.inst , PWM_CHANNEL_0 ,   1 ,   1);      //high:0.0625us     low:0.0625us     period:8MHz
+    app_pwm_set_time(&bxpwm.inst , PWM_CHANNEL_1 , 160 , 160);      //high:10us         low:10us         period:50kHz
+    app_pwm_set_time(&bxpwm.inst , PWM_CHANNEL_2 , 160 , 320);      //high:10us         low:20us         period:33.33kHz
+    app_pwm_set_time(&bxpwm.inst , PWM_CHANNEL_3 , 160 ,   0);      //still high
+    app_pwm_set_time(&bxpwm.inst , PWM_CHANNEL_4 ,   0 , 160);      //still low
 
 
-===============    =======================================================
-函数                | 含义
-===============    =======================================================
-app_pwm_start       | 开启PWM输出。
-                    | 此操作会重新读取param成员中的参数然后输出。
-app_pwm_stop        | 关闭PWM输出。
-                    | 此操作会关闭PWM模块，同时将IO口输出为低电平。
-===============    =======================================================
+如上述代码所示，参数含义如下表：
 
-
-*********************
-【实例配置与效果】
-*********************
-
-配置1：
-=======
-
-
-===================================    =========
-参数                                    取值
-===================================    =========
-ALL_CHANNEL_PWM_CLK_DIV                 1
-high_time                               0
-low_time                                0
-波形
-.. image:: img/pwm_example1.png
-===================================    =========
+=============    ==================================================
+参数               含义
+=============    ==================================================
+hdl                配置哪个PWM实例。
+channel            配置哪一个通道
+high_time          | 高电平持续时间，以分频之后的频率来计数。
+                   | 如果该参数为0，则输出常低。
+low_time           | 低电平持续时间，以分频之后的频率来计数。
+                   | 如果该参数为0，则输出常高。
+=============    ==================================================
 
 
 
-配置2：
-=======
+方式二：配置频率与占空比
+----------------------------
 
-===================================    =========
-参数                                    取值
-===================================    =========
-ALL_CHANNEL_PWM_CLK_DIV                 1
-high_time                               99
-low_time                                199
-波形
-.. image:: img/pwm_example2.png
-===================================    =========
+.. code:: c
 
+    //#define ALL_CHANNEL_PWM_CLK_DIV     1
+    app_pwm_set_duty(&bxpwm.inst , PWM_CHANNEL_0 , 1000   ,   0);   //still low
+    app_pwm_set_duty(&bxpwm.inst , PWM_CHANNEL_1 , 1000   , 100);   //still high
+    app_pwm_set_duty(&bxpwm.inst , PWM_CHANNEL_2 , 1000   ,  10);   //high:100us     low:900us    period:1000us
+    app_pwm_set_duty(&bxpwm.inst , PWM_CHANNEL_3 , 10000  ,  20);   //high:20us      low:80us     period:100us
+    app_pwm_set_duty(&bxpwm.inst , PWM_CHANNEL_4 , 100000 ,  30);   //high:3us       low:7us      period:10us
 
 
-配置3：
-=======
+如上述代码所示，参数含义如下表：
 
-===================================    =========
-参数                                    取值
-===================================    =========
-ALL_CHANNEL_PWM_CLK_DIV                 15
-high_time                               9
-low_time                                9
-波形
-.. image:: img/pwm_example3.png
-===================================    =========
-
-
-
-配置4：
-=======
-
-===================================    =========
-参数                                    取值
-===================================    =========
-ALL_CHANNEL_PWM_CLK_DIV                 15
-high_time                               999
-low_time                                1999
-波形
-.. image:: img/pwm_example4.png
-===================================    =========
-
-
+=============    ==================================================
+参数               含义
+=============    ==================================================
+hdl                配置哪个PWM实例。
+channel            配置哪一个通道
+frequency          输出PWM的频率，单位为Hz。(max 160k hz)
+percent            | PWM的占空比，范围：0~100
+                   | 如果该参数为100，则输出常高。
+                   | 如果该参数为0，则输出常低。
+=============    ==================================================
 
 
 
