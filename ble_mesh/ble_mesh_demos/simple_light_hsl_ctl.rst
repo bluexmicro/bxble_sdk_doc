@@ -1,5 +1,5 @@
 ==============================================
-simple generic onoff server  demo
+simple light hsl ctl demo
 ==============================================
 
 
@@ -7,52 +7,50 @@ simple generic onoff server  demo
 ==============================================
 * 示例功能简介
 
-    * 参考:	 `示例功能简介`_
+    * 参考:     `示例功能简介`_
 
-* 如何运行示例代码  
+* 如何运行示例代码
 
-    * 参考:	 `示例运行概要`_
+    * 参考:     `示例运行概要`_
 
-* 如何设置 ble mesh 角色  
+* 如何设置 ble mesh 角色
 
-    * 参考:	 `ble mesh 角色设置`_
+    * 参考:     `ble mesh 角色设置`_
 
-* 如何处理 ble mesh 协议栈和应用协议栈的信息交互  
+* 如何处理 ble mesh 协议栈和应用协议栈的信息交互
 
-    * 参考:	 `ble mesh 协议栈和应用协议栈的信息交互`_
+    * 参考:     `ble mesh 协议栈和应用协议栈的信息交互`_
 
 
 _`示例功能简介`
 ==================
-
-本示例功能主要实现SIG 标准的 generic onoff server model，可以用于灯等设备模型。 
-本示例实例化了两个element，每个element包括一个 onoff server model，初始化部分
+本示例功能主要实现 SIG 标准的 light hsl server 和 light ctl server model，可以用于灯等设备模型。
+本示例实例化了两个element，第一个element包括一个 hsl server model，第二个element包括一个 ctl server model初始化部分
 可以参考examples 目录下 node_setup.c 文件里面的 mesh_app_init_user函数说明，开发者
 可以非常容易添加更多的model。每个model初始化需要开发者初始化相关的控制接口，在例子
-程序中user_onoff_0_evt_cb，user_onoff_1_evt_cb分别作为两个开发者接口，通过控制灯
+程序中user_hsl_0_evt_cb，user_ctl_1_evt_cb分别作为两个开发者接口，通过控制灯
 的亮灭来进行示例。例子程序中的 generic_transition_server_0 和 generic_transition_server_1
-两个 model 是设置 default transtion time,当发送的 onoff 命令中不带有 transition time 和 delay时。
-系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数即可，参考user_config_server_evt_cb 
-函数的实现，并在初始化进行注册。另外，为了对系统进行控制，在element0 里面也初始化了SIG 的
-config server model以便进行入网等相关的系统控制操作。
+两个 model 是设置 default transtion time,当发送的 hsl 和 ctl 命令中不带有 transition time 和 delay时。
+hsl server 绑定了 lightness server, level server 和 onoff server, 如果发送lightness, level 和
+onoff 的命令也会改变该灯的亮度，系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理
+函数即可，参考user_config_server_evt_cb 函数的实现，并在初始化进行注册。另外，为了对系统进行
+控制，在element0 里面也初始化了SIG 的 config server model以便进行入网等相关的系统控制操作。
 
 该示例主要体现的功能点如下：
+
 ********************************
 
 
 * 设备支持mesh proxy，可以通过手机，经gatt连接快速配置入网。
 
 
-* 节点上有两个generic onoff server，可以通过手机单独控制任一 server。
+* 节点上有一个light hsl server，一个 light ctl server 可以通过手机单独控制任一 server。
 
 
 * 节点支持分组，可以分组控制。
 
 
 * 节点支持relay可控，可以通过 config 命令配置，便于部署。
-  注意：需要打开example下控制该功能的宏
-
-* 节点支持proxy server beacon 可控，可以手动打开或关闭该beacon，便于部署。
 
 
 _`示例运行概要`
@@ -65,40 +63,33 @@ ________________________________________________________________________________
 
 * 按键
 
-  botton 3  button 4 同时按下 ，心跳灯会快闪，，直到绿灯闪一下，设备重启并重新初始化，该操作会丢弃所有之前配置，设备变成unprovision 状态
-  
-* PIN   
+  botton 3  button 4 同时按下 ，直到绿灯闪一下，设备重启并重新初始化，该操作会丢弃所有之前配置，设备变成unprovision 状态
 
-  PIN 7 8  短路 ：  relay 功能打开，LED2 蓝灯亮。
-  
-  PIN 10 11短路 ：  延迟一分钟后 关闭proxy server beacon 功能打开，LED1红灯亮。
-  
 * 指示灯
 
-  * led1 :   
-     * 绿灯   
-                * 熄灭， 设备proxy server beacon 功能打开；
-                * 常亮， 设备proxy server beacon 功能关闭；
-     * 蓝灯   
-                * 熄灭， generic onoff server **1** 设置关闭；
-                * 常亮， generic onoff server **1** 设置打开；
-     * 红灯   
-                * 熄灭， 保留；
-                * 常亮， 保留；
-  * led2 : 
-     * 绿灯   
-                * 闪烁， 设备正常工作；
-                * 常亮/长灭， 设备异常；
-     * 蓝灯   
-                * 熄灭， relay 功能关闭；
-                * 常亮， relay 功能打开；
-     * 红灯  
-                * 熄灭， generic onoff server **2** 设置关闭；
-                * 常亮， generic onoff server **2** 设置打开；
+  * led1 :
+       * 熄灭：
+            light hsl server **1** 设置的 lightness 值为 0；
+       * 不同亮度和颜色
+            light hsl server **1** 设置的 lightness 的值为不为 0 的值，并且和 hue于 saturation 的值转换成
+            RGB 值然后显示成不同的颜色。
+  * led2 :
+       * 绿灯
+                * 闪烁，每隔一段时间亮灭一次；
+       * 蓝灯
+                * 熄灭:
+                    *light ctl server **2** 设置亮度的 lightness 值设置为0；
+                * 不同亮度:
+                    *light ctl server **2** 设置亮度的 lightness 为 0 的不同亮度
+       * 红灯
+                * 熄灭:
+                    *light ctl server **2** 设置色温的 temperature 值设置为0；
+                * 不同亮度:
+                    *light ctl server **2** 设置亮度的 temperature 为 0 的不同亮度
 
 软件环境
 ********************************
-* 设备端运行 ble mesh sdk 的 examples 目录下 simple_generic_onoff_server_with_relay示例。
+* 设备端运行 ble mesh sdk 的 examples 目录下 simple_light_hsl_ctl示例。
 * 手机端运行 任意厂商符合mesh标准的app。
 
 软件运行流程
@@ -107,7 +98,7 @@ ________________________________________________________________________________
 **1. 用户自己函数入口**
 
    在 mesh_user_main.c 中， mesh_user_main_init()初始化自己数据。（需要注意：不能阻塞）
-   
+
 **2. 开启mesh协议栈调度**
 
    在用户函数执行完后，系统自动开启ble协议栈调度。
@@ -118,34 +109,26 @@ ________________________________________________________________________________
 
     void mesh_user_main_init(void)
     {
-        //user data init
-        simple_generic_onoff_server_init();
+        ///user data init
+        simple_light_hsl_ctl_init();
 
         LOG(LOG_LVL_INFO,"mesh_user_main_init\n");
     }
 
 例程初始状态
 ********************************
-设备正常上电后： 
-  * led1 : 
-     * 绿灯   
-                * 熄灭， 设备proxy server beacon 功能默认打开；
-     * 蓝灯   
-                * 常亮， generic onoff server **1** 默认设置打开；
-     * 红灯  
-                * 熄灭， 保留；
-  * led2 : 
-     * 绿灯   
-                * 闪烁， 设备正常工作；
-     * 蓝灯   
-                * 熄灭， relay 功能默认关闭；
-     * 红灯  
-                * 常亮， generic onoff server **2** 默认设置打开；
-
-
+设备正常上电后：
+  * led1 :
+       * 常亮, 默认为白色的光，此时亮度为 50%， lightness 的值为 0x8000, hue 的值为0 ，saturation 的值为0；
+  * led2 :
+       * 绿灯
+                * 闪烁，每隔一段时间亮灭一次；；
+       * 红灯
+                * 熄灭
 
 _`ble mesh 角色设置`
 ===================================================================================================================
+
 .. code:: c
 
     static void user_role_init(void)
@@ -260,7 +243,6 @@ _`ble mesh 协议栈和应用协议栈的信息交互`
       {
           case CONFIG_SERVER_EVT_RELAY_SET :
           {
-              break;
           }
           case CONFIG_SERVER_EVT_APPKEY_ADD:
           {
@@ -268,7 +250,6 @@ _`ble mesh 协议栈和应用协议栈的信息交互`
           break;
           case CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_ADD:
           {
-              break;
           }
           default:break;
       }
@@ -315,4 +296,3 @@ _`ble mesh 协议栈和应用协议栈的信息交互`
 
 .. code:: c
     void config_server_evt_act(config_server_evt_type_t type , config_server_evt_param_t param);
-

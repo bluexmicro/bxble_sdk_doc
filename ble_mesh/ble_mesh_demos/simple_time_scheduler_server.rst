@@ -55,10 +55,8 @@ onoff 的命令也会改变该灯的亮度，系统也会将关键事件通知�
 * 节点支持分组，可以分组控制。
 
 
-* 节点支持relay可控，可以手动打开或关闭relay，便于部署。
+* 节点支持relay可控，可以通过 config 命令配置，便于部署。
 
-
-* 节点支持proxy server beacon 可控，可以手动打开或关闭该beacon，便于部署。
 
 
 _`示例运行概要`
@@ -82,7 +80,7 @@ ________________________________________________________________________________
   * led1 :
       * 熄灭：
             light hsl server **1** 设置的 lightness 值为 0；
-       * 不同亮度和颜色
+      * 不同亮度和颜色
             light hsl server **1** 设置的 lightness 的值为不为 0 的值，并且和 hue于 saturation 的值转换成
             RGB 值然后显示成不同的颜色。
   * led2 :
@@ -290,44 +288,44 @@ _`ble mesh 协议栈和应用协议栈的信息交互`
 根据收到的事件，做相应处理或回复
 ********************************
 
-.. code:: c
+.. code:: h
 
     //协议->用户
+      /** Configuration server event type. */
     typedef enum
     {
-        /*******PROVISIONER*******/
-        PROV_EVT_BEACON,
-        PROV_EVT_CAPABILITIES,
-        PROV_EVT_READ_PEER_PUBLIC_KEY_OOB,
-        PROV_EVT_AUTH_DISPLAY_NUMBER,//provisioner expose random number (NO ACTION)
-        PROV_EVT_AUTH_INPUT_NUMBER,   //alert input dialog
-        PROV_EVT_PROVISION_DONE,    //(NO ACTION)
+        CONFIG_SERVER_EVT_APPKEY_ADD,
+        CONFIG_SERVER_EVT_APPKEY_UPDATE,
+        CONFIG_SERVER_EVT_MODEL_PUBLICATION_SET,
+        CONFIG_SERVER_EVT_APPKEY_DELETE,
+        CONFIG_SERVER_EVT_BEACON_SET,
+        CONFIG_SERVER_EVT_DEFAULT_TTL_SET,
+        CONFIG_SERVER_EVT_FRIEND_SET,
+        CONFIG_SERVER_EVT_GATT_PROXY_SET,
+        CONFIG_SERVER_EVT_KEY_REFRESH_PHASE_SET,
+        CONFIG_SERVER_EVT_MODEL_PUBLICATION_VIRTUAL_ADDRESS_SET,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_ADD,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_DELETE,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_DELETE_ALL,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_OVERWRITE,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_VIRTUAL_ADDRESS_ADD,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_VIRTUAL_ADDRESS_DELETE,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_VIRTUAL_ADDRESS_OVERWRITE,
+        CONFIG_SERVER_EVT_NETWORK_TRANSMIT_SET,
+        CONFIG_SERVER_EVT_RELAY_SET,
+        CONFIG_SERVER_EVT_LOW_POWER_NODE_POLLTIMEOUT_SET,
+        CONFIG_SERVER_EVT_HEARTBEAT_PUBLICATION_SET,
+        CONFIG_SERVER_EVT_HEARTBEAT_SUBSCRIPTION_SET,
+        CONFIG_SERVER_EVT_MODEL_APP_BIND,
+        CONFIG_SERVER_EVT_MODEL_APP_UNBIND,
+        CONFIG_SERVER_EVT_NETKEY_ADD,
+        CONFIG_SERVER_EVT_NETKEY_DELETE,
+        CONFIG_SERVER_EVT_NETKEY_UPDATE,
+        CONFIG_SERVER_EVT_NODE_IDENTITY_SET,
+        CONFIG_SERVER_EVT_NODE_RESET,
+    }config_server_evt_type_t;
 
-        /*******UNPROV DEVICE*******/
-        UNPROV_EVT_INVITE_MAKE_ATTENTION,//(NO ACTION)
-        UNPROV_EVT_EXPOSE_PUBLIC_KEY, //(NO ACTION)
-        UNPROV_EVT_AUTH_INPUT_NUMBER,//alert input dialog
-        UNPROV_EVT_AUTH_DISPLAY_NUMBER,//unprov_device expose random number //(NO ACTION)
-        UNPROV_EVT_PROVISION_DONE, //(NO ACTION)
-    } mesh_prov_evt_type_t;
 
-    //用户->协议栈（回复）
-    typedef enum
-    {
-        /*******PROVISIONER*******/
-        //PROV_EVT_AUTH_INPUT_NUMBER
-        PROV_ACTION_AUTH_INPUT_NUMBER_DONE,//input random number done
-        //PROV_EVT_READ_PEER_PUBLIC_KEY_OOB
-        PROV_ACTION_READ_PEER_PUBLIC_KEY_OOB_DONE,
-        //PROV_EVT_BEACON
-        PROV_ACTION_SET_LINK_OPEN,
-        //PROV_EVT_CAPABILITIES
-        PROV_ACTION_SEND_START_PDU,
-
-        /*******UNPROV DEVICE*******/
-        //UNPROV_EVT_AUTH_INPUT_NUMBER
-        UNPROV_ACTION_AUTH_INPUT_NUMBER_DONE,//input random number done
-    } mesh_prov_action_type_t;
-
-    void provision_action_send (mesh_prov_action_type_t type , mesh_prov_evt_param_t param);
+.. code:: c
+    void config_server_evt_act(config_server_evt_type_t type , config_server_evt_param_t param);
 
