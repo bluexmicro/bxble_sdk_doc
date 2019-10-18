@@ -16,7 +16,7 @@ ancs client用于和苹果手机通信，苹果手机上有一个ancs服务，�
     #define BX_APP_CONFIG_H_
 
     #define CFG_PRF_ANCC
-    #define BLE_GATTS_CLIENT
+    #define CFG_PRF_GATTSC
 
     #endif
 
