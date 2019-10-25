@@ -47,27 +47,18 @@ RAMLOG的数据结构如下表所示：
 
 .. code:: c
 
-    typedef struct
-    {
-        char    *current_pointer;   //sprintf buffer pointer
-        uint32_t current_offset;    //offset in internal_log_buf
-        uint32_t log_cnt;           //log counter
-        uint32_t log_line_cnt;      //new line log counter
-    }ram_log_t;
-    
-    ram_log_t ram_log;
-    
-    char internal_log_buf[INTERNAL_LOG_MAX_SIZE];
+    uint8_t  ram_log_buf[INTERNAL_LOG_MAX_SIZE];
+    uint8_t *ram_log_pointer = ram_log_buf;
 
 
 
-首先需要找到 internal_log_buf 数组的地址，该数组保存了所有的RAM LOG。
+首先需要找到 ram_log_buf 数组的地址，该数组保存了所有的RAM LOG。
 
-其次需要找到 ram_log.current_pointer ，该数值表示了最后一条RAM LOG写到的位置。 注意如果LOG数据比较多，会循环覆盖掉最旧的。
+其次需要找到 ram_log_pointer ，该数值表示了最后一条RAM LOG写到的位置。 注意如果LOG数据比较多，会循环覆盖掉最旧的。
 
-如果没有循环覆盖，则LOG内容为：[internal_log_buf -> ram_log.current_pointer]
+如果没有循环覆盖，则LOG内容为：{&ram_log_buf[0] -> ram_log_pointer}
 
-如果存在循环覆盖，则最新LOG内容为： [ram_log.current_pointer -> internal_log_buf+INTERNAL_LOG_MAX_SIZE ] 以及 [internal_log_buf -> ram_log.current_pointer]
+如果存在循环覆盖，则最新LOG内容为： {ram_log_pointer -> &ram_log_buf[INTERNAL_LOG_MAX_SIZE]} 以及 {&ram_log_buf[0] -> ram_log_pointer}
 
 
 
