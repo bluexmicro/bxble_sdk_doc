@@ -1,5 +1,5 @@
 ==============================================
-simple generic onoff server  demo
+simple tmjl button anl demo
 ==============================================
 
 
@@ -7,145 +7,110 @@ simple generic onoff server  demo
 ==============================================
 * 示例功能简介
 
-    * 参考:	 `示例功能简介`_
+    * 参考:     `示例功能简介`_
 
-* 如何运行示例代码  
+* 如何运行示例代码
 
-    * 参考:	 `示例运行概要`_
+    * 参考:     `示例运行概要`_
 
-* 如何设置 ble mesh 角色  
+* 如何设置 ble mesh 角色
 
-    * 参考:	 `ble mesh 角色设置`_
+    * 参考:     `ble mesh 角色设置`_
 
-* 如何处理 ble mesh 协议栈和应用协议栈的信息交互  
+* 如何处理 ble mesh 协议栈和应用协议栈的信息交互
 
-    * 参考:	 `ble mesh 协议栈和应用协议栈的信息交互`_
+    * 参考:     `ble mesh 协议栈和应用协议栈的信息交互`_
 
 
 _`示例功能简介`
 ==================
-
-本示例功能主要实现SIG 标准的 generic onoff server model，可以用于灯等设备模型。 
-本示例实例化了两个element，每个element包括一个 onoff server model，初始化部分
-可以参考examples 目录下 node_setup.c 文件里面的 mesh_app_init_user函数说明，开发者
-可以非常容易添加更多的model。每个model初始化需要开发者初始化相关的控制接口，在例子
-程序中user_onoff_0_evt_cb，user_onoff_1_evt_cb分别作为两个开发者接口，通过控制灯
-的亮灭来进行示例。例子程序中的 generic_transition_server_0 和 generic_transition_server_1
-两个 model 是设置 default transtion time,当发送的 onoff 命令中不带有 transition time 和 delay时。
-系统也会将关键事件通知到开发者，开发者完成自己的关键事件处理函数即可，参考user_config_server_evt_cb 
-函数的实现，并在初始化进行注册。另外，为了对系统进行控制，在element0 里面也初始化了SIG 的
-config server model以便进行入网等相关的系统控制操作。
+本示例功能主要实现 SIG 标准的 light_ctl_client, light_lightness_client 和generic_onoff_client 和天猫精灵的开关板模型。
+可以用于灯等设备模型。本示例实例化了一个element，每个element包括一个 light ctl client, 
+generic onoff client 和 vendor server 模型。初始化部分可以参考examples 目录下 node_setup.c 文件里面的
+mesh_app_init_user函数说明，开发者可以非常容易添加更多 client 的 model。另外，为了对系统进行控制，
+并且可以控制别的灯，需要给开关板的每个 client model 配置一个 publish 地址。现在目前只是统一的往 0xC000 地址发。该model 实现了开关板的
+低功耗的功能，可以调节灯的亮度，色温，开关，并且亮度和色温支持无极调光。
 
 该示例主要体现的功能点如下：
 ********************************
 
+* 设备支持 advertising，经 adv 通过天猫精灵连接快速配置入网。
 
 * 设备支持mesh proxy，可以通过手机，经gatt连接快速配置入网。
 
-
-* 节点上有两个generic onoff server，可以通过手机单独控制任一 server。
-
-
 * 节点支持分组，可以分组控制。
-
-
-* 节点支持relay可控，可以通过 config 命令配置，便于部署。
-  注意：需要打开example下控制该功能的宏
-
-* 节点支持proxy server beacon 可控，可以手动打开或关闭该beacon，便于部署。
-
 
 _`示例运行概要`
 ===================
 
 硬件环境
 ********************************
-该示例运行在 BLE Dongle 开发板上（开发板的详细信息，参考硬件支持包），用到硬件外设如下：
+该示例运行在 BLE 开关板开发板上（开发板的详细信息，参考硬件支持包），用到硬件外设如下：
 _______________________________________________________________________________________________
 
-* 按键
+* 恢复出场设置
 
-  botton 3  button 4 同时按下 ，心跳灯会快闪，，直到绿灯闪一下，设备重启并重新初始化，该操作会丢弃所有之前配置，设备变成unprovision 状态
-  
-* PIN   
+  长按开关板的多功能键，大概三到四秒直至发现指示灯会亮灭的闪，说明设备重启并重新初始化，该操作会丢弃所有之前配置，
+  设备变成unprovision 状态，而且只有在灯一直闪烁的时候灯才会发 unprovision 的包，才可以被入网，并且被入网成功之后
+  指示灯才不会闪烁进入熄灭状态。
 
-  PIN 7 8  短路 ：  relay 功能打开，LED2 蓝灯亮。
-  
-  PIN 10 11短路 ：  延迟一分钟后 关闭proxy server beacon 功能打开，LED1红灯亮。
-  
 * 指示灯
 
-  * led1 :   
-     * 绿灯   
-                * 熄灭， 设备proxy server beacon 功能打开；
-                * 常亮， 设备proxy server beacon 功能关闭；
-     * 蓝灯   
-                * 熄灭， generic onoff server **1** 设置关闭；
-                * 常亮， generic onoff server **1** 设置打开；
-     * 红灯   
-                * 熄灭， 保留；
-                * 常亮， 保留；
-  * led2 : 
-     * 绿灯   
-                * 闪烁， 设备正常工作；
-                * 常亮/长灭， 设备异常；
-     * 蓝灯   
-                * 熄灭， relay 功能关闭；
-                * 常亮， relay 功能打开；
-     * 红灯  
-                * 熄灭， generic onoff server **2** 设置关闭；
-                * 常亮， generic onoff server **2** 设置打开；
+  * 默认是不亮，为了省电，但是长按多功能键进入到可被入网状态之后灯会一直闪烁，直至入网成功。
 
 软件环境
 ********************************
-* 设备端运行 ble mesh sdk 的 examples 目录下 simple_generic_onoff_server_with_relay示例。
-* 手机端运行 任意厂商符合mesh标准的app。
+
+* 设备端运行 ble mesh sdk 的 examples 目录下 simple_tmjl_button_anl示例。
+* 用手机端或者天猫精灵入网调试，支持任意符合 mesh 标准的命令。
 
 软件运行流程
 ********************************
+**1. 用天猫精灵入网时需要注意的地方**
+    * 在编译出来的 hex 的 0x80200 位置填入设备的 MAC 地址，该地址是需要申请的，如下所示：
+        0xb9,0x9f,0x31,0xca,0xd2,0x38
+    * 在编译出来的 hex 的 0x802010 位置填上 USER UNPROV STATIC AUTH VAL, 该值必须要是用申请的三元组通过hash 256 生成前 16 个字节，如下所示: 
+        0xa5,0x95,0xaf,0x15,0x7f,0x3c,0xe2,0x48,0x2b,0xfb,0x25,0xe1,0x82,0x1c,0x1b,0x4f
+    * 在编译出来的 hex 的 0x802020 位置上填上 USER UNPROV BEACON UUID 宏前面字节必须是注册的 company ID, Product ID 和当前设备的 MAC 地址组成,具体组成如下所示：
+        0xa8,0x01,\
+        0x51,\
+        0x17,0x0f,0x00,0x00,\
+        0xb9,0x9f,0x31,0xca,0xd2,0x38,\
+        0x00,0x00,0x00  
 
-**1. 用户自己函数入口**
+**2. 用户自己函数入口**
 
    在 mesh_user_main.c 中， mesh_user_main_init()初始化自己数据。（需要注意：不能阻塞）
-   
-**2. 开启mesh协议栈调度**
+
+**3. 开启 mesh 协议栈调度**
 
    在用户函数执行完后，系统自动开启ble协议栈调度。
 
-**3. 示例代码**
+**4. 示例代码**
 
 .. code:: c
 
     void mesh_user_main_init(void)
     {
-        //user data init
-        simple_generic_onoff_server_init();
+        ///user data init
+        simple_tmjl_button_anl_init();
 
         LOG(LOG_LVL_INFO,"mesh_user_main_init\n");
     }
 
 例程初始状态
 ********************************
-设备正常上电后： 
-  * led1 : 
-     * 绿灯   
-                * 熄灭， 设备proxy server beacon 功能默认打开；
-     * 蓝灯   
-                * 常亮， generic onoff server **1** 默认设置打开；
-     * 红灯  
-                * 熄灭， 保留；
-  * led2 : 
-     * 绿灯   
-                * 闪烁， 设备正常工作；
-     * 蓝灯   
-                * 熄灭， relay 功能默认关闭；
-     * 红灯  
-                * 常亮， generic onoff server **2** 默认设置打开；
-
+设备正常上电后：
+  * 入网前:
+       * 非清网重启: 上电一瞬间指示灯会闪烁一下;
+       * 清网重启: 指示灯会一直闪烁，直至被入网;
+  * 入网后 :
+       * 上电一瞬间指示灯会闪烁一下;
 
 
 _`ble mesh 角色设置`
 ===================================================================================================================
+
 .. code:: c
 
     static void user_role_init(void)
@@ -207,20 +172,37 @@ _`ble mesh 角色设置`
 **3. 初始化角色相关的数据**
 
 .. code:: c
-
+    #define FLASH_TAG_SAVE_AUTH_VAL 0x2010
+    #define FLASH_TAG_SAVE_BEACON_UUID 0x2020
+  
     static void unprov_data_init(void)
     {
         volatile mesh_prov_evt_param_t evt_param;
-
+  
         uint8_t  bd_addr[GAP_BD_ADDR_LEN];
-
+    #if 1
+        uint8_t value[16];
+        uint8_t value_len = 16; 
+        if(flash_multi_read(FLASH_TAG_SAVE_AUTH_VAL, value_len, value) == NVDS_OK) {
+            memcpy(m_unprov_user.static_value, value, value_len);
+        }   
+        //show_buf("FLASH_TAG_SAVE_AUTH_VAL", value, value_len);
+        if(flash_multi_read(FLASH_TAG_SAVE_BEACON_UUID, value_len, value) == NVDS_OK) {
+            memcpy(m_unprov_user.beacon.dev_uuid, value, value_len);
+        }   
+        //show_buf("FLASH_TAG_SAVE_BEACON_UUID", value, value_len);
+    #endif
+  
         //get bd_addr
         mesh_core_params_t core_param;
         core_param.mac_address = bd_addr;
         mesh_core_params_get(MESH_CORE_PARAM_MAC_ADDRESS,&core_param);
-
+  
+        //copy mac to uuid
+        memcpy(m_unprov_user.beacon.dev_uuid + 7, bd_addr, GAP_BD_ADDR_LEN);
+  
         //1. Method of configuring network access
-        evt_param.unprov.method = PROVISION_BY_GATT;
+        evt_param.unprov.method = MESH_UNPROV_PROVISION_METHOD;
         provision_config(UNPROV_SET_PROVISION_METHOD,evt_param);
         //2. private key
         memcpy(m_unprov_user.unprov_private_key,bd_addr,GAP_BD_ADDR_LEN);
@@ -233,10 +215,11 @@ _`ble mesh 角色设置`
         evt_param.unprov.p_dev_capabilities = &m_unprov_user.dev_capabilities;
         provision_config(UNPROV_SET_OOB_CAPS,evt_param);
         //5.adv beacon
-        memcpy(m_unprov_user.beacon.dev_uuid,bd_addr,GAP_BD_ADDR_LEN);
+       //memcpy(m_unprov_user.beacon.dev_uuid,bd_addr,GAP_BD_ADDR_LEN);
         evt_param.unprov.p_beacon = &m_unprov_user.beacon;
         provision_config(UNPROV_SET_BEACON,evt_param);
     }
+
 
 **4. 协议栈开始完整运行**
 
@@ -260,10 +243,25 @@ _`ble mesh 协议栈和应用协议栈的信息交互`
       {
           case CONFIG_SERVER_EVT_RELAY_SET :
           {
-              break;
           }
+          break;
           case CONFIG_SERVER_EVT_APPKEY_ADD:
           {
+              uint8_t status = 0;
+              bind_appkey_to_model(&tmall_model_server_0.model.base, 0, &status);
+              bind_appkey_to_model(&tmall_model_client_0.model.base, 0, &status);
+              bind_appkey_to_model(&health_server_0.model.base, 0, &status);
+              bind_appkey_to_model(&generic_onoff_client_0.model.base, 0, &status);
+              bind_appkey_to_model(&generic_level_client_0.model.base, 0, &status);
+              bind_appkey_to_model(&light_lightness_client_0.model.base, 0, &status);
+              bind_appkey_to_model(&light_ctl_client_0.model.base, 0, &status);
+              bind_appkey_to_model(&light_hsl_client_0.model.base, 0, &status);
+  
+              bind_appkey_to_model(&generic_onoff_server_0.model.base, 0, &status);
+              bind_appkey_to_model(&light_lightness_server_0.model.base, 0, &status);
+              bind_appkey_to_model(&light_ctl_server_0.model.base, 0, &status);
+              bind_appkey_to_model(&light_hsl_server_0.model.base, 0, &status);
+
           }
           break;
           case CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_ADD:
@@ -315,4 +313,3 @@ _`ble mesh 协议栈和应用协议栈的信息交互`
 
 .. code:: c
     void config_server_evt_act(config_server_evt_type_t type , config_server_evt_param_t param);
-

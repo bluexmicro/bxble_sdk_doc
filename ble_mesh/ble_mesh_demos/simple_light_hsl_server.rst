@@ -26,7 +26,8 @@ _`示例功能简介`
 ==================
 本示例功能主要实现 SIG 标准的 light hsl server model，可以用于灯等设备模型。
 本示例实例化了两个element，每个element包括一个 hsl server model，初始化部分
-可以参考examples 目录下 mesh_app.c 文件里面的 mesh_app_init_user函数说明，开发者
+可以参考examples 目录下 mesh_app.c 文件里面的 mesh_app_init_user函数说明，由于芯片的 PWM
+只有5路，两个 HSL server 需要 6 路 PWM，故将 element 的调灯只有一个颜色的灯。开发者
 可以非常容易添加更多的model。每个model初始化需要开发者初始化相关的控制接口，在例子
 程序中user_hsl_0_evt_cb，user_hsl_1_evt_cb分别作为两个开发者接口，通过控制灯
 的亮灭来进行示例。例子程序中的 generic_transition_server_0 和 generic_transition_server_1
@@ -50,10 +51,7 @@ onoff 的命令也会改变该灯的亮度，系统也会将关键事件通知�
 * 节点支持分组，可以分组控制。
 
 
-* 节点支持relay可控，可以手动打开或关闭relay，便于部署。
-
-
-* 节点支持proxy server beacon 可控，可以手动打开或关闭该beacon，便于部署。
+* 节点支持relay可控，可以通过 config 命令配置，便于部署。
 
 
 _`示例运行概要`
@@ -128,12 +126,8 @@ ________________________________________________________________________________
   * led2 :
        * 绿灯
                 * 熄灭， 保留；
-       * 蓝灯
-                * 熄灭， relay 功能默认关闭；
        * 红灯
-                * 常亮， light hsl server **2** 默认设置打开亮度 lightness 为 50%,此时 lightness 的值为0x8000；
-
-
+                * 常亮， light hsl server **2** 默认设置打开亮度 lightness 为 50%,此时 lightness 的值为0x8000;
 
 _`ble mesh 角色设置`
 ===================================================================================================================
@@ -246,83 +240,65 @@ _`ble mesh 协议栈和应用协议栈的信息交互`
 
 .. code:: c
 
-    /* unprovision device event callback function */
-    static void mesh_unprov_evt_cb(mesh_prov_evt_type_t type , mesh_prov_evt_param_t param)
-    {
-        LOG(LOG_LVL_INFO,"mesh_unprov_evt_cb type : %d\n",type);
-
-        switch(type)
-        {
-            case  UNPROV_EVT_INVITE_MAKE_ATTENTION : //(NO ACTION)
-            {
-
-            }
-            break;
-            case  UNPROV_EVT_EXPOSE_PUBLIC_KEY :  //(NO ACTION)
-            {
-
-            }
-            break;
-            case  UNPROV_EVT_AUTH_INPUT_NUMBER : //alert input dialog
-            {
-
-            }
-            break;
-            case  UNPROV_EVT_AUTH_DISPLAY_NUMBER : //unprov_device expose random number //(NO ACTION)
-            {
-
-            }
-            break;
-            case  UNPROV_EVT_PROVISION_DONE :  //(NO ACTION)
-            {
-
-            }
-            break;
-            default:break;
-        }
-    }
+    /* provision device event callback function */
+    void user_config_server_evt_cb(config_server_evt_type_t type, config_server_evt_param_t*p_param)
+  {
+      LOG(LOG_LVL_INFO , "user_config_server_evt_cb=%d\n",type);
+  
+      switch(type)
+      {
+          case CONFIG_SERVER_EVT_RELAY_SET :
+          {
+          }
+          case CONFIG_SERVER_EVT_APPKEY_ADD:
+          {
+          }
+          break;
+          case CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_ADD:
+          {
+          }
+          default:break;
+      }
+  }
 
 根据收到的事件，做相应处理或回复
 ********************************
+.. code:: h
+
+  /** Configuration server event type. */
+    typedef enum
+    {
+        CONFIG_SERVER_EVT_APPKEY_ADD,
+        CONFIG_SERVER_EVT_APPKEY_UPDATE,
+        CONFIG_SERVER_EVT_MODEL_PUBLICATION_SET,
+        CONFIG_SERVER_EVT_APPKEY_DELETE,
+        CONFIG_SERVER_EVT_BEACON_SET,
+        CONFIG_SERVER_EVT_DEFAULT_TTL_SET,
+        CONFIG_SERVER_EVT_FRIEND_SET,
+        CONFIG_SERVER_EVT_GATT_PROXY_SET,
+        CONFIG_SERVER_EVT_KEY_REFRESH_PHASE_SET,
+        CONFIG_SERVER_EVT_MODEL_PUBLICATION_VIRTUAL_ADDRESS_SET,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_ADD,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_DELETE,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_DELETE_ALL,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_OVERWRITE,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_VIRTUAL_ADDRESS_ADD,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_VIRTUAL_ADDRESS_DELETE,
+        CONFIG_SERVER_EVT_MODEL_SUBSCRIPTION_VIRTUAL_ADDRESS_OVERWRITE,
+        CONFIG_SERVER_EVT_NETWORK_TRANSMIT_SET,
+        CONFIG_SERVER_EVT_RELAY_SET,
+        CONFIG_SERVER_EVT_LOW_POWER_NODE_POLLTIMEOUT_SET,
+        CONFIG_SERVER_EVT_HEARTBEAT_PUBLICATION_SET,
+        CONFIG_SERVER_EVT_HEARTBEAT_SUBSCRIPTION_SET,
+        CONFIG_SERVER_EVT_MODEL_APP_BIND,
+        CONFIG_SERVER_EVT_MODEL_APP_UNBIND,
+        CONFIG_SERVER_EVT_NETKEY_ADD,
+        CONFIG_SERVER_EVT_NETKEY_DELETE,
+        CONFIG_SERVER_EVT_NETKEY_UPDATE,
+        CONFIG_SERVER_EVT_NODE_IDENTITY_SET,
+        CONFIG_SERVER_EVT_NODE_RESET,
+    }config_server_evt_type_t;
+
 
 .. code:: c
-
-    //协议->用户
-    typedef enum
-    {
-        /*******PROVISIONER*******/
-        PROV_EVT_BEACON,
-        PROV_EVT_CAPABILITIES,
-        PROV_EVT_READ_PEER_PUBLIC_KEY_OOB,
-        PROV_EVT_AUTH_DISPLAY_NUMBER,//provisioner expose random number (NO ACTION)
-        PROV_EVT_AUTH_INPUT_NUMBER,   //alert input dialog
-        PROV_EVT_PROVISION_DONE,    //(NO ACTION)
-
-        /*******UNPROV DEVICE*******/
-        UNPROV_EVT_INVITE_MAKE_ATTENTION,//(NO ACTION)
-        UNPROV_EVT_EXPOSE_PUBLIC_KEY, //(NO ACTION)
-        UNPROV_EVT_AUTH_INPUT_NUMBER,//alert input dialog
-        UNPROV_EVT_AUTH_DISPLAY_NUMBER,//unprov_device expose random number //(NO ACTION)
-        UNPROV_EVT_PROVISION_DONE, //(NO ACTION)
-    } mesh_prov_evt_type_t;
-
-    //用户->协议栈（回复）
-    typedef enum
-    {
-        /*******PROVISIONER*******/
-        //PROV_EVT_AUTH_INPUT_NUMBER
-        PROV_ACTION_AUTH_INPUT_NUMBER_DONE,//input random number done
-        //PROV_EVT_READ_PEER_PUBLIC_KEY_OOB
-        PROV_ACTION_READ_PEER_PUBLIC_KEY_OOB_DONE,
-        //PROV_EVT_BEACON
-        PROV_ACTION_SET_LINK_OPEN,
-        //PROV_EVT_CAPABILITIES
-        PROV_ACTION_SEND_START_PDU,
-
-        /*******UNPROV DEVICE*******/
-        //UNPROV_EVT_AUTH_INPUT_NUMBER
-        UNPROV_ACTION_AUTH_INPUT_NUMBER_DONE,//input random number done
-    } mesh_prov_action_type_t;
-
-    void provision_action_send (mesh_prov_action_type_t type , mesh_prov_evt_param_t param);
-
+    void config_server_evt_act(config_server_evt_type_t type , config_server_evt_param_t param);
