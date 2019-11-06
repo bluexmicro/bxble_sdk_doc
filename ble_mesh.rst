@@ -7,6 +7,7 @@ BLE Mesh
 .. toctree::
     :maxdepth: 1
 
+    ble_mesh/mesh_wxapp_tree 
     ble_mesh/mesh_android 
     ble_mesh/mesh_structure 
     ble_mesh/ble_mesh_project_config
