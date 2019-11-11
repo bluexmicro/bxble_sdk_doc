@@ -73,8 +73,8 @@ App 效果图
 关于MeshOTAManager使用
 ************************
 
- .. image:: ../img/Android_App_Ui1.jpg
- .. image:: ../img/Android_App_Ui2.jpg
+ .. image:: ../img/Android_App_UI1.png
+ .. image:: ../img/Android_App_UI2.png
 
 
 
