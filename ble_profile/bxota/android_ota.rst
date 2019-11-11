@@ -63,19 +63,22 @@ Android OTA 流程 分为两个阶段
 *************************
    
  .. image:: ../img/OTA_tansport.png
-   
  .. image:: ../img/AndroidOTASequenceChart.png
  
 
 App 效果图
 *************************************************
+  
+ .. image:: ../img/Android_App_UI1.png
+
+ .. image:: ../img/Android_App_UI2.png
+
+
+
+
 
 关于MeshOTAManager使用
 ************************
-
- .. image:: ../img/Android_App_UI1.png
- .. image:: ../img/Android_App_UI2.png
-
 
 
 .. code:: java
