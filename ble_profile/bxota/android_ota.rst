@@ -68,10 +68,7 @@ Android OTA 流程 分为两个阶段
 
 App 效果图
 *************************************************
-  
- .. image:: ../img/Android_App_UI1.png
-
- .. image:: ../img/Android_App_UI2.png
+   .. image:: ../img/Android_App_UI1.png
 
 
 
