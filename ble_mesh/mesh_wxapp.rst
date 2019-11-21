@@ -1,118 +1,114 @@
 
 
-初始化Blemanager.js
+初始化Provisioner
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 ::
 
     
-      let blueStateCb = {
+      MeshController=getApp().getMeshController()
 
-            onBlueOpened: function (res) {
-                that.globalData.bluetoothEnable = true
-            },
-            onBlueOpenfailed: function (res) {
-                that.globalData.bluetoothEnable = false
-                that.showToast('请开启蓝牙')
-            },
-            onDeviceConnected: function (res) {
-                that.showToast('已连接')
-               connSateChangeCallback.forEach((value, key, map) => {
-                    value.onDeviceConnected(res)
+        MeshController.Provisioner.nodeDataObserver.set(function () {
+            let devices = MeshController.Provisioner.nodes.get()
+            //数据更新
+            that.setData({devices})
+             
+            console.log('notify data changed')
+        });
+        MeshController.Provisioner.init();
+        MeshController._setConnStateChangelistener(function (res) {
+        // 设备连接状态更新回调
+            console.log('connected:'+JSON.stringify(res))
+            if (res.connected) {
+               Loading.showToast('connected');
+                that.setData({
+                    connected: true,
+                    deviceName: res.name,
+                    connState: 'disconnect'
                 })
-
-            },
-            onDeviceDisConnected: function (res) {
-                that.showToast('连接断开')
-               connSateChangeCallback.forEach((value, key, map) => {
-                    value.onDeviceDisConnected(res)
+            } else {
+                Loading.showToast('disconnected');
+                that.setData({
+                    connected: false,
+                    deviceName: 'Bluex Mesh',
+                    connState: 'connect'
                 })
-            },
-            onDeviceReady: function () {
-                    deviceReadyObserver.forEach((value, key, map) => {
-                        value()
-                    })
-            },
-            onBlueAdapterEnabled: function (res) {
-                that.globalData.bluetoothEnable = true
-                // that.showToast('蓝牙已开启')
-            },
-            onBlueAdapterdisabled: function (res) {
-                that.globalData.bluetoothEnable = false
-                that.showToast('请开启蓝牙')
-            },
-            onScanResults: function (res) {
-             // 扫描到设备后回调
-                scanResultCallback.forEach((value, key, map) => {
-                    value(res)
-                })
-            },
-            onDataReceived: function (res) {
-                that.globalData.meshApi.parseNotification(res)
             }
-        }
-    let bleManager = new BleManager(blueStateCb);
-
-
-
+        });
+    // 下拉刷新数据
+    MeshController.Provisioner.reSlectNodes();
 
 开始扫描
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 ::
         
-      // 扫描设备 扫描设备前请确保蓝牙已经开启  具体细节请查看demo
-      // 扫描未入网设备 uuid ：00001827-0000-1000-8000-00805F9B34FB
-      // 扫描已经入网设备 uuid ：00001828-0000-1000-8000-00805F9B34FB
-    startScan: function (uuid) {
-        if (this.isBluetoothEnable()) {
-            return bleManager.startScan(uuid)
-        } else {
-            this.showToast('请开启蓝牙')
-            return new Promise((resolve, reject) => {
-                reject(null)
-            })
-        }
+     
+     //扫描未入网设备
+    MeshController.scanUnprovDevice(function (device) {
+                    addDevice(device)
+                }).then(res => {
+                }).catch(reason => {
+                 Loading.hideLoading()
+                    showError(reason)
+                })
 
-    }
+    //扫描已入网设备
+      let params = {}
+                params.cb = function (device) {
+                    addDevice(device)
+                }
+                Loading.showLoading('scanning')
+                MeshController.scanProxyNode(params).then(res => {
+                }).catch(reason => {
+                    Loading.hideLoading()
+                    showError(reason)
+                })   
+
    
 连接设备
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 ::
 
-    //这段代码在app.js 文件中
-    connect: function (device) {
-        function success(res) {
-            return new Promise(resolve => {
-                resolve(res)
-            })
-        }
+       MeshController.stopScan().then(res => {
+                Loading.showLoading(title);
+                let device =  bluetoothDevice;
+                let conn2ProxyNode=that.data.uuid[0]===MESH_PROXY_UUID[0]//是否连接入网的节点
+                MeshController.connect({device},conn2ProxyNode).then(res => {
+                    //  连接设备成功
+                    Loading.hideLoading()
+                    switch (that.data.uuid[0]) {
+                        case MESH_PROVISION_UUID[0]:
+                            wx.navigateTo({
+                                url: '../provision/provisioner?device=' + JSON.stringify(bluetoothDevice)
+                            })
+                            break;
+                        case MESH_PROXY_UUID[0]:
+                            MeshController.setCurNode(bluetoothDevice.name)
+                            wx.navigateBack()
+                            break;
+                        default:break;
+                    }
+                }).catch(reason => {
+                    Loading.hideLoading()
+                    // 连接异常捕获 具体请参考errCode.js中的定义 这里的处理方式 ->重新连接
+                  conn('reconnecting')
+                    // showError(reason)
+                })
 
-        function fail(res) {
-            return new Promise((resolve, reject) => {
-                reject(res)
-            })
-        }
+            }).catch(reason => {
+                showError(reason)
+            });
 
-        return this.getbleManager().createBLEConnection(device).then(res => {
-            //连接成功并发现服务此时小程序可以跟mesh 设备进行通信
-            return success(res)
-        }).catch(reason => {
-            return fail(reason)
-        })
-
-    },
-
-
-如果连接的是未入网设备（uuid:00001827-0000-1000-8000-00805F9B34FB）连接成功后，可以进行入网设备
+开始入网设备
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 ::
     
     //例如provisioner.js 部分代码如下显示
-    // 注册入网回调
-     meshApi.setMeshProvisioningHandler({
+      //注册入网过程回调
+      MeshController.setMeshProvisioningHandler({
             onStartInvite: function (res) {
                 // that.sendingProvisionInvite()
                 that.setProvisionState(res)
-               
+
             },
             onReceivedCapabilities: function (res) {
                 that.setProvisionState(res)
@@ -146,71 +142,16 @@
             onSendingProvisionData: function (res) {
 
                 that.setProvisionState(res)
-                that.updateProvisionedInfo({
-                    deviceKey: res.provisionBox.deviceKey,
-                    unicastAddress: res.provisionBox.unicastAddress
-                })
             },
             onReceivedProvisionComplete: function (res) {
-               //入网完成
-                that.setProvisionState(res)
-                that.saveProvisionedNode(res)
-                that.disconn()
+                that.setProvisionState(res).disconn()
             },
-        })
-    //调用如下代码就可以进行入网操作 
-       meshApi.startInvite()
+           })
 
-入网成功后小程序会自动断开连接并且再次去连接该设备并且获取节点数据信息代码如下
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-:: 
-
-   //以下下步骤都是自动完成的
-   onReceivedProvisionComplete: function (res) {
-               //入网完成
-                that.setProvisionState(res)
-                that.saveProvisionedNode(res)
-                that.disconn()
-            },
-
-
-
-                // 入网完毕断开连接并且重新连接
-    disconn: function () {
-        let that = this
-        this.setProvisionState({type: TYPE.OTHER, status: '断开连接中'})
-        getApp().disconnect().then(res => {
-                that.setProvisionState({type: TYPE.OTHER, status: '连接断开'})
-                setTimeout(function () {
-                    that.reconnectDevice()
-                }, 2500)
-            },
-        )
-    },
-
-    //重新连接设备，
-    reconnectDevice: function () {
-        let that = this
-        this.setProvisionState({type: TYPE.OTHER, status: '连接中'})
-        getApp().connect(that.data.curDevice).then(res => {
-            getApp().setSelectNode(that.provisonedNode)
-            that.setProvisionState({type: TYPE.OTHER, status: '已连接'})
-            //获取节点信息数据
-            that.sendingComposeDataGet()
-        })
-    },
-
-
-  
-    sendingComposeDataGet: function () {
-        sendMessage(new ConfigCompositionDataGet(this.getCurrentUnicastAddress()))
-    },
-  
-    //注册mesh 消息回调  provisioner.js
-    
-        meshApi.registerMeshMessageHandler(KEY, function (res) {
+             //注册Mesh 消息回调（已经入网，后续的消息包括配置消息，OnOff消息）
+             MeshController.registerMeshMessageHandler(KEY, function (res) {
                 let state
-                switch (res.opcode) {
+                switch (res.opCode) {
                     case OPCODE.SEG_ACK://sending block ack
                         state = {type: TYPE.WRITE, status: 'Sending BlockAcknowledgement'};
                         break;
@@ -230,23 +171,17 @@
                         state = {type: TYPE.WRITE, status: 'Sending ConfigSubsctiptionAdd'};
                         break;
                     case OPCODE.CONFIG_COMPOSITION_DATA_STATUS:
-                        //收到设备回复的节点信息
                         state = {type: TYPE.RECEIVED, status: 'Receiving CompositionDataStatus'}
-                        //发送加解密appkey
-                        that.sendingConfigAppKeyAdd();
-
+                        sendingConfigAppKeyAdd();
                         break;
                     case OPCODE.CONFIG_APPKEY_STATUS:
-                        //收到设备回复appkey Status 
                         state = {type: TYPE.RECEIVED, status: 'Receive ConfigAppkeyStatus'};
                         if (res.statusMessage.StatusCode == 0) {
-                           // 此时设备已经存储appkey 便于后续消息加解密
                             initwillBindKeyModel(that);
                             nextMessageSend();
                         }
                         break
                     case OPCODE.CONFIG_MODEL_APP_STATUS:
-
                         state = {type: TYPE.RECEIVED, status: 'Receive ConfigModelAppkeyBindStatus'};
                         nextMessageSend();
                         break;
@@ -258,52 +193,78 @@
                         break;
                 }
                 if (state) {
+                   //刷新界面
                     that.setProvisionState(state)
                 }
             }
         )
 
-
-                function nextMessageSend() {
+         function nextMessageSend() {
             let msg = that.data.queue.pop()
             if (msg) {
                 sendMessage(msg)
                 that.pageScrollToBottom();
             } else {
-            //配置消息发送完毕 退出当前界面，当前使用到的配置消息如下
-          
-               // ConfigCompositionDataGet 获取节点信息消息
-               // ConfigAddKeyAdd 添加发送开关灯消息加解密appkey
-               // ConfigModelAddKeyBind  绑定添加appkey
-               // ConfigModelSubscriptionAdd 将灯添加分组（可以将不同的设备加入相同分组）这样就可以实现一个按键控制多个灯
-                
+            //  配置消息发送完毕  退出当前界面,
                 getApp().switchTab('network')
-            // 此时已经可以通过小程序来控制设备了
             }
 
         }
+
+            //初始化需要绑定appkey,订阅组地址的model
+            function initwillBindKeyModel(context) {
+               let currentNode = MeshController.getCurNode();
+           let dst = currentNode.unicastAddress;
+            let queue = context.data.queue;
+           let groups = MeshController.getGroups();
+           currentNode.elements.map((element, index, self) => {
+            element.models.map(model => {
+            let modelId = parseInt(model.modelId, 16)
+            if (modelId === 0x1000) {
+                // model绑定appkey
+                let appKeyIndex = 0
+                queue.push(new ConfigModelAddKeyBind(dst, element.elementAddress, appKeyIndex, modelId))
+                // mdoel 订阅组地址 也就是Groups.js 界面的分组控制OnOff
+                let subscriptionAddress = groups.length > 0 ? groups[0].address : 0xc000
+                queue.push(new ConfigModelSubscriptionAdd(dst, element.elementAddress, subscriptionAddress, modelId))
+
+            }
+
+        })
+    })
+  
+
+}
+
+
 
 控制设备
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
  ::
     
-   function initMeshMsgHandler() {
-            meshApi.registerMeshMessageHandler(getPageKey(), function (res) {
-                switch (res.opcode) {
+
+         //注册消息回调
+         (function initMeshMsgHandler() {
+            MeshController.registerMeshMessageHandler(getPageKey(), function (res) {
+                switch (res.opCode) {
                     case CONFIG_COMPOSITION_DATA_GET:
-                        app.showLoading('loading')
                         break;
 
                     case CONFIG_NODE_RESET_STATUS:
                         // if connected device  is reset  should  disconnect
-                        if (app.getSelectedNode().name === app.getConnDevice().name) {
-                            app.disconnect().then(res => {
-                                LOG('onConfigNodeResetStatusReceived')('disconnect:' + JSON.stringify(res))
-                                app.switchMain()
-                            })
+                        let isCurNodeReset = MeshController.isCurNodeReset()
+                        console.debug('isCurNodeReset：'+isCurNodeReset)
+                        if (isCurNodeReset) {
+                            setTimeout(res => {
+                                MeshController.disconnect().then(res => {
+                                    getApp().switchMain()
+                                }).catch(reason => {
+                                })
+                            }, 500)
                         } else {
-                            app.switchMain()
+                            getApp().switchMain()
                         }
+
                         break;
                     case CONFIG_COMPOSITION_DATA_STATUS:
                         setupNodeInfo(that)
@@ -316,68 +277,40 @@
                         break;
                     case CONFIG_MODEL_SUBSCRIPTION_STATUS:
                         nextMessage()
-
                         break;
                     case GENERIC_ON_OFF_STATUS:
-                      //收到设备回复OnOffStatus 表示On/off
-                      //刷新界面 显示灯亮灭
+                      //收到设备回复OnOff消息 刷新界面
                         that.updateOnOffModelState(res.statusMessage)
                         break;
-
+ 
                 }
 
 
-            })
+               })
 
 
+          })();
+
+
+            function sendMessage(message) {
+             //判断设备是否已连接
+                if (MeshController.connected()) {
+                MeshController.sendMeshMessage(message).catch(reason => {
+                    console.error('sendMessage error:' + reason)
+                });
+            } else {
+               //连接设备
+            }
         }
-
-    //在nodeConfig.js 中 可以看到如下代码
-    //GenericOnOffSetAck 带回复的消息，发送后如果设备收到，设备会回复GENERIC_ON_OFF_STATUS
-      genericOnSet: function (e) {
-        //打开灯
-        this.curElementAddress = e.currentTarget.dataset.data.elementAddress
-        sendMessage(new GenericOnOffSetAck(1, app.getMeshConfig().seq_num, this.curElementAddress))
-        // this.updateOnOffModelState({mTargetOn:true})
-    },
-    genericOffSet: function (e) {
-      //关闭灯
-        this.curElementAddress = e.currentTarget.dataset.data.elementAddress
-        sendMessage(new GenericOnOffSetAck(0, app.getMeshConfig().seq_num, this.curElementAddress))
-        // this.updateOnOffModelState({mTargetOn:false})
-    },
+        // 亮灯
+         sendMessage(new GenericOnOffSetAck(1, _seqNum(), this.curElementAddress))
+         // 灭灯
+          sendMessage(new GenericOnOffSetAck(0, _seqNum(), this.curElementAddress))
 
 
-   // 再看一个无回复的消息   group.js 中的部分代码
-   //GenericOnOffSetUnAck 代表无回复消息，一般用于控制一系列设备，前提是订阅了该消息的地址，具体的地址可查看创建分组
-       groupSendOn: function (e) {
-        let that = this
-        let address = e.currentTarget.dataset.dst.address
-        // this.setOnOffImage(1, address)
-        getApp().getMeshApi().sendMeshMessage(new GenericOnOffSetUnAck(1, getApp().getMeshConfig().seq_num, address)).catch(res => {
-            if (res.errCode === DEVICE_NOT_CONN) {
-                getApp().showToast(res.reason)
-                setTimeout(() => {
-                    that.route()
-                }, 500)
-            }
-        })
-    },
-    groupSendOff: function (e) {
-        let that = this
-        let address = e.currentTarget.dataset.dst.address
-        // this.setOnOffImage(0, address)
-        getApp().getMeshApi().sendMeshMessage(new GenericOnOffSetUnAck(0, getApp().getMeshConfig().seq_num, address)).catch(res => {
-            if (res.errCode === DEVICE_NOT_CONN) {
-                getApp().showToast(res.reason)
-                setTimeout(() => {
-                    that.route()
-                }, 500)
-            }
 
-        })
 
-    },
+
 
 
 创建分组  
@@ -446,27 +379,53 @@
   
         
         // qrcode.js 中的部分代码
-        scanQrcode: function (e) {
-        wx.scanCode({
+      wx.scanCode({
             onlyFromCamera: true,
             scanType: ['qrCode']
             , success(res) {
                 let obj = JSON.parse(res.result)
                 if (obj.openid) {
-                    getApp().updateUserBindInfo(obj.openid, function () {
-                    // 扫码成功
-                        getApp().switchTab('network')
+                   getApp().getMeshController().bindUser(obj.openid).then(res=>{
+                       getApp().switchTab('network')
                     })
                 } else {
-                    getApp().showToast('数据非法')
                 }
 
             }
         })
-
     }
 
 
+log 输出
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+::
+       
+       MeshController.setLogger({
+            DEBUG:function (tag,info) {
+                console.debug(tag+'\n'+info)
+            },
+            ERROR:function (tag,info) {
+                console.error(tag+'\n'+info)
+            }
+        });
+
+
+
+
+
+
+
+
+关闭数据及时刷新监听   具体使用细节请查看小程序文档云函数使用
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+::
+
+    MeshController.CloudController.closeNodesWatch()
+        MeshController. CloudController.closeGroupWatch()
+        MeshController.CloudController.closeProCfgWatch() 
+
+           
+ 
 云函数定义
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 ::
@@ -516,6 +475,9 @@
    
 
 
+
+
+
 导入默认的入网配置
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 ::
@@ -543,3 +505,5 @@
 2  如发现扫描不到设备，请确认是否开启蓝牙
 
 3  如果发现小程序显示一直在连接设备，或者连接设备失败，请尝试退出当前页面，再次扫描设备进行连接操作.
+
+
