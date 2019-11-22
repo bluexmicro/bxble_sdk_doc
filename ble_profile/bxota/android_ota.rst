@@ -1,10 +1,10 @@
-
-Android OTA 流程 分为两个阶段
-#############################
+=======================
+BX2400 OTA  on Android
+=======================
   
  
 第一阶段
-***************
+==================================================================================================================================================================================================================================================================================================================================
    #. 连接设备。
    #. 读取设备服务列表。
    #. 发现服务（gatt.discoverServices()）。
@@ -16,25 +16,29 @@ Android OTA 流程 分为两个阶段
    #. 以上是OTA准备状态。
    
 第一阶段流程图如下所示
-************************
+==================================================================================================================================================================================================================================================================================================================================
    
  .. image:: ../img/BXOTAAndroid_READY.png
    
   
 第二阶段流程图如下所示
-*************************
+==================================================================================================================================================================================================================================================================================================================================
    
  .. image:: ../img/OTA_tansport.png
- .. image:: ../img/AndroidOTASequenceChart.png
+
  
-   
-收发数据特征值
-*******************************************************
-   #. ctrlChar:00007000-0000-1000-8000-00805F9B34FB
-   #. dataChar:00007001-0000-1000-8000-00805F9B34FB
+    
+OTA 升级的三种情况流程图
+==================================================================================================================================================================================================================================================================================================================================
  
+ .. image:: ../img/OTA.png
+ .. image:: ../img/OTA_with_Crc32.png
+ .. image:: ../img/OTA_with_crc32_signature.png
+
+
+
 OTA opcode 说明 
-*******************************************************
+==================================================================================================================================================================================================================================================================================================================================
 
       #. ctrlChar>控制特征值
 
@@ -49,166 +53,28 @@ OTA opcode 说明
 
 
 CRC32  ftp://bluexsh.22ip.net/misc/OTA/crc32/
-**************************************************************************************************************
-
-
-OTA 具体操作流程（以下步骤操作前提是设备已经连接ctrlChar，dataChar 已经获取到）
-**************************************************************************************************************
-    #.ctrlChar
-      step 1 请求OTA
-       mtu=20-1 , crc32:4byte 小端,  imagelength：4byte 小端
-       
-       格式：[opcode,mtu,00,crc32,imagelength]
-
-       ->ctrlChar.write(BXOTA_CTRL_PKT_START_REQ-mtu-00)   不进行CRC32校验  
-
-       ->ctrlChar.write(BXOTA_CTRL_PKT_START_REQ-mtu-00-crc32)  添加CRC32校验
-
-      step 2 <- 回调 onCharacteristicIndicated:ctrlChar.getvalue()=>value[0]==BXOTA_CTRL_PKT_START_RSP?请求成功：失败
-       
-      step 3 signature.bin传输
-       
-        格式：[opcode,index,sigData]
-
-        opcode=BXOTA_CTRL_PKT_SIGN_DATA_SEND
-
-        index=0~3 signature.bin文件 64bytes 分成4段
-
-        sigData=16bytes
-    
-        ctrlChar.write(BXOTA_CTRL_PKT_SIGN_DATA_SEND-index-sigData)
-
-       每写一次都会回调 onCharacteristicWrite
-       ::
-
-             bytes data=characteristic.getValue()
-              switch(data[0]){
-              case:BXOTA_CTRL_PKT_SIGN_DATA_SEND
-              {    
-                index=txData[1]
-                    if(index<3){
-                     index++
-                     ctrlChar.write(BXOTA_CTRL_PKT_SIGN_DATA_SEND-index-sigData)
-                    }else{
-                     //这里才开始image 传输
-                     startOTATransfer()
-                    }
-                    
-                  
-              }
-                   
-              }
+==================================================================================================================================================================================================================================================================================================================================
 
 
 
-   #.image 传输
-    #. ctrlChar
-
-      格式：[opcode,blockiId,blockiId>>8]
-
-       ctrlChar.write(BXOTA_CTRL_PKT_NEW_BLOCK_CMD-blockiId,blockiId>>8)
-       ::
-         
-           回调>onCharacteristicWrite
-           byte[] txData=ctrlChar.getvalue()
-           opcode=txData[0]
-           switch(opcode){
-           case:BXOTA_CTRL_PKT_NEW_BLOCK_CMD:
-             //第一个block 写入
-              OTATransferContinue(true)
-                break;
-           }
-
-
-         void OTATransferContinue(boolean newBlock) {
-          int segmentNum = getSegmentNumOfCurrentBlock();
-         if (newBlock) {
-            currentSegment = 0;
-           } else {
-            ++currentSegment;
-           }
-           while (currentSegment < segmentNum && currentAck[currentSegment]) {
-            ++currentSegment;
-           }
-           if (currentSegment == segmentNum) {
-               
-             mBluetoothGatt.readCharacteristic(dataChar) ;//当前block写入完毕 询问设备当前block 写入状态
-              //接着回调
-              @Override
-             protected void onCharacteristicRead(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattCharacteristic characteristic) {
-            super.onCharacteristicRead(gatt, characteristic);
-            final byte[] data = characteristic.getValue();
-            log(Log.DEBUG, "dataReceived: " + ParserUtils.parse(data));
-            if (characteristic.getUuid().compareTo(MESH_OTA_CHAR_DATA_UUID) == 0) {
-                onAckRead(characteristic.getValue());
-              }
-              }
-
-             } else {
-             segmentTX();
-             }
-
-             }
-
-              void onAckRead(byte[] rxBytes) {
-        boolean allAcked = true;
-        int segmentNum = getSegmentNumOfCurrentBlock();
-        for (int i = 0; i < segmentNum; ++i) {
-            //check  data send
-            if ((rxBytes[i / 8] & (1 << i % 8)) != 0) {
-                currentAck[i] = true;
-             } else {
-                // transfor filed
-                allAcked = false;
-                currentAck[i] = false;
-
-             }
-            }
-          if (allAcked) {
-            float progress = (float) (currentBlock + 1) / blockNum;
-            mCallbacks.onProgress(progress);
-            if (++currentBlock == blockNum) {
-                log(Log.DEBUG, "OTA Complete");
-                imageTXFinishCmd();
-            } else {
-                log(Log.DEBUG, " next block:" + currentBlock);
-                newBlockCmd();
-            }
-        } else {
-            //tranfor failed >>continue transfor
-            OTATransferContinue(true);
-        }
-
-    }
-
-#. dataChar>
-
-  #.  当写入当前block的最后一个segment完成后，手机请求gatt.read(dataChar)当前block的segment写入状态。
-  #.  设备响应当前block写入状态。
-
-  #.  判断获取的byte[]数据,每个字节代表每个segment写入的状态。
-
-    #. 如果全部写入成功。
-    #. 判断当前的block是否是最后一个block。
-    #. 如果是，说明所有的block写入完成，此时手机发送写入数据完成请求，设备回复写入数据完成后，说明整个OTA  image写入成功。
-    #. 如果不是，说明还有block没有写入，此时开启新的block write 
-
-  #. 如果部分segment写入失败，重新写入blocks data
-     #. 例如一个block 有128个segments,其中下标为0,2,58,127的segment 传输失败（lost in air）
-     
-     那么必须将当前0~127的segment 从新写入一遍。
-   
 
 App 效果图
-*************************************************
+==================================================================================================================================================================================================================================================================================================================================
    .. image:: ../img/Android_App_UI1.png
 
 
 
 
 
+android 代码执行步骤仅供参考
+==================================================================================================================================================================================================================================================================================================================================
+    #.请查看参考代码中 setp1~11 的执行步骤
+      
+   
+
+
 android  OTA 参考代码
-************************
+==================================================================================================================================================================================================================================================================================================================================
 
 
 ::
@@ -405,6 +271,8 @@ android  OTA 参考代码
                 byte[] txBytes = characteristic.getValue();
                 ctrlPktSent(txBytes);
             } else if (characteristic.getUuid().compareTo(MESH_OTA_CHAR_DATA_UUID) == 0) {
+               
+                // step 8 每调用一次 segmentTX 就会回调这个函数
                 OTATransferContinue(false);
             }
 
@@ -462,6 +330,7 @@ android  OTA 参考代码
     }
 
     private void segmentTX() {
+     //step 7 传输image
         int length = getSegmentLength(currentBlock, currentSegment);
         byte[] data = new byte[blockHeaderSize + length];
         data[0] = (byte) currentSegment;
@@ -493,17 +362,22 @@ android  OTA 参考代码
     void OTATransferContinue(boolean newBlock) {
         int segmentNum = getSegmentNumOfCurrentBlock();
         if (newBlock) {
+         // 当开启新的block 会执行这里
             currentSegment = 0;
             log(Log.DEBUG, "newBlock start..");
 
         } else {
+            // 写入一次就++
             ++currentSegment;
         }
+        
         while (currentSegment < segmentNum && currentAck[currentSegment]) {
             ++currentSegment;
         }
+        //step  9 判断当前block 是否写入完毕
         if (currentSegment == segmentNum) {
             log(Log.DEBUG, "Seg 1 ~ seg " + segmentNum + " write complete then read ack");
+             //step  10  手机请求读取当前block 写入状态
             readAck();
 
         } else {
@@ -538,6 +412,7 @@ android  OTA 参考代码
 
 
     private void newBlockCmd() {
+       //step 5  传输前先用ctrlChar(控制特征值)发送新的block 开始cmd
         mCallbacks.print("currentBlock:" + currentBlock);
         byte[] blockIDArray = new byte[]{(byte) currentBlock, (byte) (currentBlock >> 8)};
         ctrlPktTX(BXOTA_CTRL_PKT_NEW_BLOCK_CMD, blockIDArray);
@@ -558,6 +433,7 @@ android  OTA 参考代码
                 break;
             case BXOTA_CTRL_PKT_NEW_BLOCK_CMD:
                 Arrays.fill(currentAck, false);
+                //step 6 
                 OTATransferContinue(true);
                 break;
             case BXOTA_CTRL_PKT_IMAGE_TRANSFER_FINISH_CMD:
@@ -565,9 +441,12 @@ android  OTA 参考代码
                 break;
             case BXOTA_CTRL_PKT_SIGN_DATA_SEND:
                 mCallbacks.print(String.format("sign data:%d of 4 send complete", +txData[1]));
+                //step 3-2 // 这里会连续回调4次  也就是写入四次 
+                
                 if (txData[1] < MAX_SIGNATURE_SEGMENT_COUNT) {
                     transSignDataCmd(txData[1] + 1);
                 } else {
+                    
                     startOTATransfer();
                 }
 
@@ -591,6 +470,7 @@ android  OTA 参考代码
 
 
     private void startOtaRequest() {
+      //step 1 
         mCallbacks.onOTARequestStart();
         int lenth = mNeedCrc32 ? 10 : 2;
         ByteBuffer buffer = ByteBuffer.allocate(lenth).order(ByteOrder.LITTLE_ENDIAN);
@@ -616,14 +496,18 @@ android  OTA 参考代码
         int status = rxData[1];
         switch (rxData[0]) {
             case BXOTA_CTRL_PKT_START_RSP:
+             //step 2
                 log(Log.DEBUG, "received OTA start Resp");
                 maxSegmentNumInBlock = rxData[2] * 8;
                 log(Log.DEBUG, "total segments size(): " + maxSegmentNumInBlock);
                 currentAck = new boolean[maxSegmentNumInBlock];
                 if (status == 0) {
+                //step 3 判断是否需要验证Signature data
                     if (mNeedCheckSign) {
+                       //step 3-1  传输signature.bin 中的0~16 bytes
                         transSignDataCmd(0);
                     } else {
+                       
                         startOTATransfer();
                     }
 
@@ -642,6 +526,7 @@ android  OTA 参考代码
 
 
     private void startOTATransfer() {
+     //step 4  开始传输image
         mCallbacks.onOTAStart();
         new Thread(new Runnable() {
             @Override
@@ -665,6 +550,7 @@ android  OTA 参考代码
     }
 
     void onAckRead(byte[] rxBytes) {
+    // step 11 接收到设备返回的block 写入状态
         boolean allAcked = true;
         int segmentNum = getSegmentNumOfCurrentBlock();
         for (int i = 0; i < segmentNum; ++i) {
@@ -681,15 +567,19 @@ android  OTA 参考代码
         if (allAcked) {
             float progress = (float) (currentBlock + 1) / blockNum;
             mCallbacks.onProgress(progress);
+            //判断所有的block 是否全部写入完毕
             if (++currentBlock == blockNum) {
                 log(Log.DEBUG, "OTA Complete");
+                //发送结束命令
                 imageTXFinishCmd();
             } else {
                 log(Log.DEBUG, " next block:" + currentBlock);
+               // 下一个block 传输
                 newBlockCmd();
             }
         } else {
             //tranfor failed >>continue transfor
+            //走到这里说明传输过程丢失了一部分数据，那么将当前block 重新传输一次
             OTATransferContinue(true);
         }
 
