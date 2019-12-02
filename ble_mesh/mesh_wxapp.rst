@@ -1,20 +1,27 @@
 
 
-初始化Provisioner
+初始化  MeshController
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+::
+       //在 app.js 中初始化一下代码
+       MeshController.init()
+       
+
+设置网络节点数据更新回调,连接状态回调
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 ::
 
     
       MeshController=getApp().getMeshController()
 
-        MeshController.Provisioner.nodeDataObserver.set(function () {
-            let devices = MeshController.Provisioner.nodes.get()
+        MeshController.nodeDataObserver.set(function () {
+            let devices = MeshController.nodes()
             //数据更新
             that.setData({devices})
              
             console.log('notify data changed')
         });
-        MeshController.Provisioner.init();
+       
         MeshController._setConnStateChangelistener(function (res) {
         // 设备连接状态更新回调
             console.log('connected:'+JSON.stringify(res))
@@ -333,7 +340,7 @@
    
    
    //ConfigModelSubscriptionAdd
-   getApp().getMeshApi().sendMeshMessage(new ConfigModelSubscriptionAdd(dst, element.elementAddress, subscriptionAddress, modelId)).catch(res => {
+   MeshController.sendMeshMessage(new ConfigModelSubscriptionAdd(dst, element.elementAddress, subscriptionAddress, modelId)).catch(res => {
             if (res.errCode === DEVICE_NOT_CONN) {
                 getApp().showToast(res.reason)
                 setTimeout(() => {
@@ -351,7 +358,7 @@
 ::
    
     //ConfigNodeReset
-     getApp().getMeshApi().sendMeshMessage(new ConfigNodeReset(app.getSelectedNode().unicastAddress)).catch(res => {
+    MeshController.sendMeshMessage(new ConfigNodeReset(app.getSelectedNode().unicastAddress)).catch(res => {
             if (res.errCode === DEVICE_NOT_CONN) {
                 getApp().showToast(res.reason)
                 setTimeout(() => {
@@ -505,5 +512,17 @@ log 输出
 2  如发现扫描不到设备，请确认是否开启蓝牙
 
 3  如果发现小程序显示一直在连接设备，或者连接设备失败，请尝试退出当前页面，再次扫描设备进行连接操作.
+ 
+ * **[Q]** 入网过程中卡在以下界面?
+
+ .. image:: ./img/wxapp_interrupt.jpg
+
+
+ * **[A]** 请查看以下视频
+
+ * https://www.ixigua.com/i6765790799360688648/
+
+   
+
 
 
